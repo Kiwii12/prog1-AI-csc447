@@ -1,0 +1,12 @@
+*.tlog
+*.opendb
+prog1.vcxproj
+*.sln
+prog1.vcxproj.filters
+*.sdf
+Debug/vc140.pdb
+*.idb
+Debug/prog1.pdb
+*.log
+Debug/ANNtrain.obj
+*.suo
