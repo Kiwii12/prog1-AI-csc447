@@ -17,3 +17,4 @@ prog1/Debug/prog1.ilk
 *.exe
 prog1/Debug/ANNtrain.obj
 prog1/Debug/anntrain.obj.enc
+*.obj
