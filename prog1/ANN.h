@@ -22,6 +22,8 @@ public:
 
 	ANN( string paramFileName );
 
+	ANN();
+
 	~ANN();
 
 	bool parseParams();
@@ -31,8 +33,6 @@ public:
 	bool openFile(ifstream &fin);
 
 
-
-private:
 	string paramFile;
 	string weightsFile;
 	int numberTrainingEpochs;

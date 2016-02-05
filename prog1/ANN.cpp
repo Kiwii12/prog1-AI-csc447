@@ -10,6 +10,11 @@ ANN::ANN( string paramFileName )
 	paramFile = paramFileName;
 }
 
+ANN::ANN()
+{
+	paramFile = "Parameter.prm";
+}
+
 ANN::~ANN()
 {
 }

@@ -1,15 +1,14 @@
 
-#include "prog1/ANN.h"
+#include "prog1\ANNtrain.h"
 
 //Reads in the parameter file and puts each value in a separate row in the prms array
 //author - Allison
 
-
-int main(int argc, char const *argv[])
+ANNtrain::ANNtrain(string paramFileName)
 {
-	ANN ann(argv[1]);
-	ann.parseParams();
+	paramFile = paramFileName;
+}
 
-
-	return 0;
+ANNtrain::~ANNtrain()
+{
 }
