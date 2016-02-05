@@ -10,3 +10,10 @@ Debug/prog1.pdb
 *.log
 Debug/ANNtrain.obj
 *.suo
+*.user
+prog1/Debug/vc140.pdb
+*.pdb
+prog1/Debug/prog1.ilk
+*.exe
+prog1/Debug/ANNtrain.obj
+prog1/Debug/anntrain.obj.enc

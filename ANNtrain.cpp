@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -25,6 +26,7 @@ void parseParam (ifstream& param, char prms[][50])
 		//if # or % ignore
 		if (firstChar == '#' || firstChar == '%')
 		{
+			//Removes the current line
 			param.getline(line, 256, '\n');
 		} else
 		{
@@ -71,11 +73,31 @@ int main(int argc, char const *argv[])
 	if (param.fail())
 	{
 		cout << "Could not open parameter file. Exiting Program" << endl;
-		//exit(0);
+		exit(1);
 	} else 
 	{
 		parseParam(param, prms);
 	}
+
+	string weightsFile = prms[0];
+	int numberTrainingEpochs = stoi ((string) prms[1]);
+	double learningRate = stod((string)prms[2]);
+	double momentum = stod(prms[3]);
+	double threshold = stod(prms[4]);
+	int layers = stoi (prms[5]);
+
+	//todo convert prms[6] to int array[layers]
+
+	string trainFile = prms[7];
+	int burnedAcreage = stoi(prms[8]);
+	int PDSIdata = stoi(prms[9]);
+	int endMonth = stoi(prms[10]);
+
+	int classes = stoi(prms[11]);
+
+	int lowCutoff = stoi(prms[12]);
+	int mediumCutoff = stoi(prms[13]);
+	//High is anything above the medium cutoff
 
 	return 0;
 }
