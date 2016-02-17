@@ -3,7 +3,7 @@
 #include "C_LoadParameters.h"
 
 //function prototypes
-int train_Net(C_Net* Net, C_LoadParameters* Parameters);
+int crossValidate_Net(C_Net* Net, C_LoadParameters* Parameters);
 
 int main(int argc, char** argv)
 {
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-int train_Net(C_Net* Net, C_LoadParameters* Parameters)
+int crossValidate_Net(C_Net* Net, C_LoadParameters* Parameters)
 {
 
 	return 0;
