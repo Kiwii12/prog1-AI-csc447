@@ -44,7 +44,9 @@
 #ifndef _C_NET_H_
 #define _C_NET_H_
 
+
 using namespace std;
+#include <cstdint>
 
 struct T_Layer
 {
@@ -61,7 +63,10 @@ public:
     ~C_Net();
     uint32_t Initialize();
 
-	//I think these function have been done by Allison
+
+    uint32_t Initialize(uint32_t num_of_layers, uint32_t* num_of_nodes_in_each_layer);
+
+//I think these function have been done by Allison
     uint32_t LoadWeightsFromFile(char* filename);
     uint32_t SaveWeightsToFile(char* filename);
     uint32_t SetSmallRandomWeights(void);
@@ -86,6 +91,10 @@ public:
 
 	//Needs to get the param file data <- pulled from ANN.h
 	void setData(Parameters newData);
+	
+	uint32_t TrainNet(void);
+	uint32_t TestNet(void);
+	uint32_t CrossValidateNet(void);
 
 private:
     uint32_t num_of_inputs;
@@ -105,8 +114,8 @@ private:
     //training parameters variables need to be added here as well
     //double learning_rate //<-- is learning_rate the only one?
 
-
 	Parameters parm;
+
 };
 
 #endif // _C_NET_H_

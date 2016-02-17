@@ -1,4 +1,5 @@
 #include "C_Net.h"
+#include <string.h>
 
 //set values to zero
 //set pointers to null
@@ -14,6 +15,19 @@ C_Net::~C_Net()
 	{
 		delete parm.netLayerNodes;
 	}
+
+	//free dynamically allocated memory
+	uint32_t i;
+	for (i = 0; i<(num_layers - 1); i++)
+	{
+		delete[] layers[i].weights;
+		delete[] layers[i].node_activated;
+	}
+	delete[] layers;
+	delete[] num_nodes_in_each_layer;
+	delete[] desired_outputs;
+	delete[] outputs;
+	delete[] inputs;
 }
 
 //set values and allocate all needed memory
@@ -27,10 +41,43 @@ uint32_t C_Net::Initialize()
 	}
 
 	//Now that we have the weights we can set up the nerual net
-	SetInputs();
-	SetDesiredOutputs();
+	//SetInputs();
+	//SetDesiredOutputs();
 
     return 1;
+}
+
+//set values and allocate all needed memory
+uint32_t C_Net::Initialize(uint32_t num_of_layers, uint32_t* num_of_nodes_in_each_layer)
+{
+	if(num_of_layers+1 < 3)
+		return 1;
+	//set variables
+	num_of_inputs = num_of_nodes_in_each_layer[0];
+	num_of_outputs = num_of_nodes_in_each_layer[num_of_layers - 1];
+	num_layers = num_of_layers+1;
+	//memory allocation
+	inputs = new double [num_of_inputs];
+	outputs = new double [num_of_outputs];
+	desired_outputs = new double [num_of_outputs];
+	num_nodes_in_each_layer = new uint32_t [num_layers];
+	memcpy(num_nodes_in_each_layer, num_of_nodes_in_each_layer, sizeof(uint32_t)*num_layers);
+	layers = new T_Layer [num_layers - 1];
+	//memory allocation for network nodes/layers
+	uint32_t i;
+	uint32_t count;
+	for( i=0; i<(num_layers - 1); i++)
+	{
+		count = num_nodes_in_each_layer[i]*num_nodes_in_each_layer[i+1];
+		layers[i].weights = new double [count];
+		count = num_nodes_in_each_layer[i+1];
+		layers[i].node_activated = new uint8_t [count];
+	}
+
+
+
+
+    return 0;
 }
 
 //load weights into memory
@@ -48,6 +95,7 @@ uint32_t C_Net::SaveWeightsToFile(char* filename)
 {
 
 	//make sure to save Weights Array
+
     return 1;
 }
 
@@ -63,7 +111,9 @@ uint32_t C_Net::SetSmallRandomWeights(void)
 //and store the values in the corresponding private variables(also not added yet)
 uint32_t C_Net::SetTrainingParameters(void)
 {
+
 	//I think this is done with the structure
+
     return 1;
 }
 
@@ -159,9 +209,29 @@ void C_Net::backwardsTrain()
 	//that led to sucess and subtracting from weights that led to falure <- if 
 	//there was a falure.
 	UpdateNet();
+
 }
 
 void C_Net::setData(Parameters newData)
 {
 	parm = newData;
 }
+
+uint32_t C_Net::TrainNet(void)
+{
+	
+	return 1;
+}
+
+uint32_t C_Net::TestNet(void)
+{
+	
+	return 1;
+}
+
+uint32_t C_Net::CrossValidateNet(void)
+{
+	
+	return 1;
+}
+

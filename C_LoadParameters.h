@@ -1,7 +1,7 @@
 /**************************************************************************//**
  * @file
  *
- * @brief This file contains the parent Class for ANN.cpp.
+ * @brief
  *****************************************************************************/
 #include <iostream>
 #include <fstream>
@@ -13,25 +13,20 @@ using namespace std;
 
 #ifndef __ANN__H__
 #define __ANN__N__
-class ANN
+class C_LoadParameters
 {
 public:
 /******************************************************************************
 *                         Function Prototypes
 ******************************************************************************/
 
-	ANN( string paramFileName );
+	C_LoadParameters( string paramFileName );
 
-	ANN();
+	C_LoadParameters();
 
-	~ANN();
+	~C_LoadParameters();
 
 	bool parseParams();
-
-	void setData(char prms[20][50]);
-
-	bool openFile(ifstream &fin);
-
 
 	string paramFile;
 	string weightsFile;
@@ -42,9 +37,11 @@ public:
 	int layers;
 
 	//todo convert prms[6] to int array[layers]
-	int *netLayerNodes;
+	uint32_t *netLayerNodes;
 
-	string trainFile;
+	//string trainFile;
+	string dataFile;
+
 	int burnedAcreage;
 	int PDSIdata;
 	int endMonth;
@@ -54,6 +51,13 @@ public:
 	int lowCutoff;
 	int mediumCutoff;
 	//High is anything above the medium cutoff
+
+private:
+    char prms[20][50];
+
+	void setData();
+
+	bool openFile(ifstream &fin);
 
 };
 
