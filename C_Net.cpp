@@ -195,10 +195,14 @@ void C_Net::fullTrainingRun()
 void C_Net::fowardRunData()
 {
 	//for each node in each hidden layer.
-	//take the value of the layer before it multiplied by the weight connecting
-	//it
-	//Add these all together... but keep a different tally for PDSI and acrees 
-	//burned
+	for (int i = 0; i < parm.layers; i++)
+	{
+		//take the value of the layer before it multiplied by the weight connecting
+		//it
+		//Add these all together... but keep a different tally for PDSI and acrees 
+		//burned
+	}
+
 }
 
 /**************************************************************************//**
