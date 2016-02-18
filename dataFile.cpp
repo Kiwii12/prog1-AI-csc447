@@ -55,7 +55,7 @@ float findMax (float values[][13], int years, int vals)
 
 }
 
-int main(int argc, char const *argv[])
+int main2(int argc, char const *argv[])
 {
 	ifstream dataFile;
 	float PDSI[100][13] = {0};

@@ -67,8 +67,8 @@ public:
     uint32_t Initialize(uint32_t num_of_layers, uint32_t* num_of_nodes_in_each_layer);
 
 //I think these function have been done by Allison
-    uint32_t LoadWeightsFromFile(char* filename);
-    uint32_t SaveWeightsToFile(char* filename);
+    uint32_t LoadWeightsFromFile(string filename);
+    uint32_t SaveWeightsToFile(string filename);
     uint32_t SetSmallRandomWeights(void);
 
     uint32_t SetTrainingParameters(void); //<-- need to add parameters to be passed

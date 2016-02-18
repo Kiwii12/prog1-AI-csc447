@@ -34,7 +34,7 @@ C_Net::~C_Net()
 uint32_t C_Net::Initialize()
 {
 	//Make sure set data is called before this function!!!
-	if (LoadWeightsFromFile /* == file does not exist */)
+	if (LoadWeightsFromFile(parm.weightsFile) /* == file does not exist */)
 	{
 		SetSmallRandomWeights();
 		//If Weights are different perhaps overright file and start over?
@@ -53,15 +53,14 @@ uint32_t C_Net::Initialize(uint32_t num_of_layers, uint32_t* num_of_nodes_in_eac
 	if(num_of_layers+1 < 3)
 		return 1;
 	//set variables
-	num_of_inputs = num_of_nodes_in_each_layer[0];
-	num_of_outputs = num_of_nodes_in_each_layer[num_of_layers - 1];
-	num_layers = num_of_layers+1;
+	num_of_inputs = parm.netLayerNodes[0];
+	num_of_outputs = parm.netLayerNodes[parm.layers - 1];
+	num_layers = parm.layers+1;
 	//memory allocation
 	inputs = new double [num_of_inputs];
 	outputs = new double [num_of_outputs];
 	desired_outputs = new double [num_of_outputs];
 	num_nodes_in_each_layer = new uint32_t [num_layers];
-	memcpy(num_nodes_in_each_layer, num_of_nodes_in_each_layer, sizeof(uint32_t)*num_layers);
 	layers = new T_Layer [num_layers - 1];
 	//memory allocation for network nodes/layers
 	uint32_t i;
@@ -84,14 +83,14 @@ uint32_t C_Net::Initialize(uint32_t num_of_layers, uint32_t* num_of_nodes_in_eac
 //return an error if file does not exist
 //return different error if number of weights in file
 //    do not match expected number of weights
-uint32_t C_Net::LoadWeightsFromFile(char* filename)
+uint32_t C_Net::LoadWeightsFromFile(string filename)
 {
 
     return 1;
 }
 
 //save weights to file
-uint32_t C_Net::SaveWeightsToFile(char* filename)
+uint32_t C_Net::SaveWeightsToFile(string filename)
 {
 
 	//make sure to save Weights Array
