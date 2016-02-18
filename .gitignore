@@ -19,3 +19,8 @@ prog1/Debug/ANNtrain.obj
 prog1/Debug/anntrain.obj.enc
 *.obj
 *.o
+Debug/prog1.ilk
+ANNtrain
+ANNtest
+CrossValidation
+*.ilk
