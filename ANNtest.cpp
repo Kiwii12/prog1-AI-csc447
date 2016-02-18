@@ -1,9 +1,8 @@
 #include <iostream>
 #include "C_Net.h"
-#include "C_LoadParameters.h"
+#include "Input.h"
 
 //function prototypes
-int test_Net(C_Net* Net, C_LoadParameters* Parameters);
 
 int main(int argc, char** argv)
 {
@@ -14,30 +13,19 @@ int main(int argc, char** argv)
 		return 1;
 
 	//initialize classes
-    C_Net Net;
-	C_LoadParameters Parameters(argv[1]);
+  C_Net net;
+	Input parameters(argv[1]);
 
 	//load parameters
-	b_error = Parameters.parseParams();
+	b_error = parameters.parseParams();
 	if(b_error == false)
 		return 2;
 
-	//initialize net
-	//(this will segfault. because netLaerNodes isn't parsed in)
-	error = Net.Initialize(Parameters.layers, Parameters.netLayerNodes);
-	if(error)
-		return 3;
+	//Passes ParamFile to the net
+	net.setData(parameters.getData());
 
-	error = train_Net(&Net, &Parameters);
-	if(error)
-		return 4;
-
+	net.TestNet();
 
 	return 0;
 }
 
-int test_Net(C_Net* Net, C_LoadParameters* Parameters)
-{
-
-	return 0;
-}
