@@ -24,7 +24,7 @@ C_Net::~C_Net()
 		delete[] layers[i].node_activated;
 	}
 	delete[] layers;
-	delete[] num_nodes_in_each_layer;
+	delete[] parm.netLayerNodes;
 	delete[] desired_outputs;
 	delete[] outputs;
 	delete[] inputs;
@@ -46,17 +46,25 @@ unsigned int C_Net::Initialize()
 	outputs = new double[parm.netLayerNodes[parm.layers -1]];
 
 	desired_outputs = new double[parm.netLayerNodes[parm.layers - 1]];
-	num_nodes_in_each_layer = new unsigned int[parm.layers+1];
+	parm.netLayerNodes = new unsigned int[parm.layers+1];
 	layers = new T_Layer[parm.layers];
 	//memory allocation for network nodes/layers
 	unsigned int i;
 	unsigned int count;
-	for (i = 0; i<(num_layers - 1); i++)
+	for (i = 0; i<(parm.layers); i++)
 	{
-		count = num_nodes_in_each_layer[i] * num_nodes_in_each_layer[i + 1];
+		if(i == 0)
+		{
+			count = (parm.netLayerNodes[i] + 1) * parm.netLayerNodes[i+1];
+		}
+		else
+		{
+			count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+		}
 		layers[i].weights = new double[count];
-		count = num_nodes_in_each_layer[i + 1];
+		count = parm.netLayerNodes[i + 1];
 		layers[i].node_activated = new uint8_t[count];
+		layers[i].node_value = new double[count];
 	}
 
 
@@ -76,16 +84,16 @@ unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_
 	inputs = new double [num_of_inputs];
 	outputs = new double [num_of_outputs];
 	desired_outputs = new double [num_of_outputs];
-	num_nodes_in_each_layer = new unsigned int [num_layers];
+	parm.netLayerNodes = new unsigned int [num_layers];
 	layers = new T_Layer [num_layers - 1];
 	//memory allocation for network nodes/layers
 	unsigned int i;
 	unsigned int count;
 	for( i=0; i<(num_layers - 1); i++)
 	{
-		count = num_nodes_in_each_layer[i]*num_nodes_in_each_layer[i+1];
+		count = parm.netLayerNodes[i]*parm.netLayerNodes[i+1];
 		layers[i].weights = new double [count];
-		count = num_nodes_in_each_layer[i+1];
+		count = parm.netLayerNodes[i+1];
 		layers[i].node_activated = new uint8_t [count];
 	}
 
@@ -146,9 +154,63 @@ unsigned int C_Net::SetDesiredOutputs(double* desired_outputs_array, unsigned in
 }
 
 //uses the input values to calculate new output values
+//runs forward through the net
 unsigned int C_Net::UpdateNet(void)
 {
-
+	int i, j, k;
+	int nodes;
+	int nodes_prev;
+	//loop through layers
+	for( i=0; i<parm.layers; i++)
+	{
+		//number of nodes in current layer
+		nodes = parm.netLayerNodes[i+1];
+		//number of nodes in previous layer
+		if(i == 0)
+		{
+			//special case: input has 1 bias node
+			nodes_prev = (parm.netLayerNodes[i] + 1) * nodes;
+		}
+		else
+		{
+			nodes_prev = parm.netLayerNodes[i] * nodes;
+		}
+		//loop through nodes
+		for( j=0; j<nodes; j++)
+		{
+			//clear node value
+			layers[i].node_value[j] = 0;
+			//loop through weights
+			for( k=0; k<nodes_prev; k++)
+			{
+				//sum inputs (from prev layer nodes)
+				if(i == 0)
+				{
+					//input layer is special case
+					//weight is j*nodes + k
+					//wieght is (current node)*nodes + (current weight)
+					layers[i].node_value[j] += inputs[k]*layers[i].weights[j*nodes + k];
+				}
+				else if( layers[i-1].node_activated[j] == 1)
+				{
+					layers[i].node_value[j] += layers[i].weights[j*nodes + k];
+				}
+				
+			}
+			
+			//now use sigmoid function
+			if(1.0/(1.0 + pow(2.7182818284, (-1.0*layers[i].node_value[j]))) > 0.5)
+			{
+				layers[i].node_activated[j] = 1;
+			}
+			else
+			{
+				layers[i].node_activated[j] = 0;
+			}
+			
+		}
+	}
+	
     return 1;
 }
 

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 

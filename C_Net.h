@@ -50,10 +50,13 @@ using namespace std;
 
 struct T_Layer
 {
+    //number of weights will be nodes in layer[i] * nodes in layer[i-1]
+    //all weights of node[0], then all weights of node[1], etc
     double* weights;
-    uint8_t* node_activated; // <-- we need this for training right?
-    // not sure if anything else is needed for training
-    // besides weights and if the node is activated/not activated
+    
+    //number of each below will be nodes in layer[i]
+    uint8_t* node_activated;
+    double* node_value;
 };
 
 class C_Net
