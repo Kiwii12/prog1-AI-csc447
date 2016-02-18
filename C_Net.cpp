@@ -22,6 +22,7 @@ C_Net::~C_Net()
 	{
 		delete[] layers[i].weights;
 		delete[] layers[i].node_activated;
+		delete[] layers[i].node_value;
 	}
 	delete[] layers;
 	delete[] parm.netLayerNodes;
@@ -46,7 +47,7 @@ unsigned int C_Net::Initialize()
 	outputs = new double[parm.netLayerNodes[parm.layers -1]];
 
 	desired_outputs = new double[parm.netLayerNodes[parm.layers - 1]];
-	parm.netLayerNodes = new unsigned int[parm.layers+1];
+	parm.netLayerNodes = new int[parm.layers+1];
 	layers = new T_Layer[parm.layers];
 	//memory allocation for network nodes/layers
 	unsigned int i;
@@ -84,7 +85,7 @@ unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_
 	inputs = new double [num_of_inputs];
 	outputs = new double [num_of_outputs];
 	desired_outputs = new double [num_of_outputs];
-	parm.netLayerNodes = new unsigned int [num_layers];
+	parm.netLayerNodes = new int [num_layers];
 	layers = new T_Layer [num_layers - 1];
 	//memory allocation for network nodes/layers
 	unsigned int i;
