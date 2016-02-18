@@ -17,7 +17,7 @@
 *
 * //call constructor and initialize
 * C_Net test_net();
-* uint32_t layer_data = [10, 12, 20, 20, 2];
+* unsigned int layer_data = [10, 12, 20, 20, 2];
 * error = test_net.Initialize(5, layer_data);
 * error = test_net.SetTrainingParameters(..., ..., ...);
 *
@@ -61,24 +61,24 @@ class C_Net
 public:
     C_Net();
     ~C_Net();
-    uint32_t Initialize();
+    unsigned int Initialize();
 
 
-    uint32_t Initialize(uint32_t num_of_layers, uint32_t* num_of_nodes_in_each_layer);
+    unsigned int Initialize(unsigned int num_of_layers, unsigned int* num_of_nodes_in_each_layer);
 
 //I think these function have been done by Allison
-    uint32_t LoadWeightsFromFile(string filename);
-    uint32_t SaveWeightsToFile(string filename);
-    uint32_t SetSmallRandomWeights(void);
+    unsigned int LoadWeightsFromFile(string filename);
+    unsigned int SaveWeightsToFile(string filename);
+    unsigned int SetSmallRandomWeights(void);
 
-    uint32_t SetTrainingParameters(void); //<-- need to add parameters to be passed
+    unsigned int SetTrainingParameters(void); //<-- need to add parameters to be passed
 
-    uint32_t SetInputs(double* inputs_array, uint32_t length);
-    uint32_t GetOutputs(double* outputs_array, uint32_t length);
-    uint32_t SetDesiredOutputs(double* desired_outputs_array, uint32_t length);
+    unsigned int SetInputs(double* inputs_array, unsigned int length);
+    unsigned int GetOutputs(double* outputs_array, unsigned int length);
+    unsigned int SetDesiredOutputs(double* desired_outputs_array, unsigned int length);
 
-    uint32_t UpdateNet(void);
-    uint32_t RunTrainingCycle(void);
+    unsigned int UpdateNet(void);
+    unsigned int RunTrainingCycle(void);
 
 	//completes the training cycle
 	void fullTrainingRun();
@@ -92,20 +92,20 @@ public:
 	//Needs to get the param file data <- pulled from ANN.h
 	void setData(Parameters newData);
 	
-	uint32_t TrainNet(void);
-	uint32_t TestNet(void);
-	uint32_t CrossValidateNet(void);
+	unsigned int TrainNet(void);
+	unsigned int TestNet(void);
+	unsigned int CrossValidateNet(void);
 
 private:
-    uint32_t num_of_inputs;
+    unsigned int num_of_inputs;
     double* inputs;
 
-    uint32_t num_of_outputs;
+    unsigned int num_of_outputs;
     double* outputs;
     double* desired_outputs;
 
-    uint32_t num_layers;
-    uint32_t* num_nodes_in_each_layer;
+    unsigned int num_layers;
+    unsigned int* num_nodes_in_each_layer;
 
     //this should be num_layers - 1 (input layer has no weights)
     //number of weights in each layer is nodes in layer * nodes in previous layer
