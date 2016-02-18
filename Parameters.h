@@ -23,7 +23,7 @@ struct Parameters
 	//todo convert prms[6] to int array[layers]
 	int *netLayerNodes;
 
-	string trainFile;
+	string dataFile; //training and testing data file
 	int burnedAcreage;
 	int PDSIdata;
 	int endMonth;

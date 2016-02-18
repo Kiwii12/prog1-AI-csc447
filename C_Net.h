@@ -74,6 +74,14 @@ public:
     unsigned int SaveWeightsToFile(string filename);
     unsigned int SetSmallRandomWeights(void);
 
+	//Nomralization functions
+	float findMin(float values[][13], int years, int vals);
+	float findMax(float values[][13], int years, int vals);
+	float normalize(float min, float max, float val);
+
+	//Read in the actual data
+	bool readInData();
+
 
     unsigned int SetInputs(double* inputs_array, unsigned int length);
     unsigned int GetOutputs(double* outputs_array, unsigned int length);
