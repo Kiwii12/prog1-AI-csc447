@@ -119,7 +119,7 @@ void Input::setData(char prms[20][50])
 		i++;
 	}
 
-	parm.trainFile = prms[7];
+	parm.dataFile = prms[7];
 	parm.burnedAcreage = stoi(prms[8]);
 	parm.PDSIdata = stoi(prms[9]);
 	parm.endMonth = stoi(prms[10]);
