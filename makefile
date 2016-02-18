@@ -1,23 +1,23 @@
-CC = g++
+# CC = g++
 
-CFLAGS = -std=c++11 -c -Wall
+# CFLAGS = -std=c++11 -Wall
 
 all: ANNtrain
 	
 	ANNtrain : C_Net.o Input.o Parameters.o ANNtrain.o
-		$(CC) C_Net.o Input.o Parameters.o ANNtrain.o -o ANNtrain
+		g++ C_Net.o Input.o Parameters.o ANNtrain.o -o ANNtrain -std=c++11
 
 	C_Net.o: C_Net.h C_Net.cpp
-		$(CC) $(CFLAGS) C_Net.h C_Net.cpp
+		g++ C_Net.h C_Net.cpp -std=c++11
 
 	Input.o: Input.h Input.cpp
-		$(CC) $(CFLAGS) Input.h Input.cpp
+		g++ Input.h Input.cpp -std=c++11
 
 	Parameters.o: Parameters.h
-		$(CC) $(CFLAGS) Parameters.h
+		g++ Parameters.h -std=c++11
 
 	ANNtrain.o: ANNtrain.cpp
-		$(CC) $(CFLAGS) ANNtrain.cpp
+		g++ ANNtrain.cpp -std=c++11
 
 	clean:
 		rm *o hello
