@@ -71,7 +71,6 @@ public:
     unsigned int SaveWeightsToFile(string filename);
     unsigned int SetSmallRandomWeights(void);
 
-    unsigned int SetTrainingParameters(void); //<-- need to add parameters to be passed
 
     unsigned int SetInputs(double* inputs_array, unsigned int length);
     unsigned int GetOutputs(double* outputs_array, unsigned int length);

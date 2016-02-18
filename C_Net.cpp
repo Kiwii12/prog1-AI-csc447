@@ -34,15 +34,31 @@ C_Net::~C_Net()
 unsigned int C_Net::Initialize()
 {
 	//Make sure set data is called before this function!!!
-	if (LoadWeightsFromFile(parm.weightsFile) /* == file does not exist */)
+	//Train Function ALWAYS starts with new weights
+	SetSmallRandomWeights();
+
+	//memory allocation
+
+	//inputs will be the number of nodes in the first layer
+	inputs = new double[parm.netLayerNodes[0]];
+
+	//output will be the number of nodes in the last layer
+	outputs = new double[parm.netLayerNodes[parm.layers -1]];
+
+	desired_outputs = new double[parm.netLayerNodes[parm.layers - 1]];
+	num_nodes_in_each_layer = new unsigned int[parm.layers+1];
+	layers = new T_Layer[parm.layers];
+	//memory allocation for network nodes/layers
+	unsigned int i;
+	unsigned int count;
+	for (i = 0; i<(num_layers - 1); i++)
 	{
-		SetSmallRandomWeights();
-		//If Weights are different perhaps overright file and start over?
+		count = num_nodes_in_each_layer[i] * num_nodes_in_each_layer[i + 1];
+		layers[i].weights = new double[count];
+		count = num_nodes_in_each_layer[i + 1];
+		layers[i].node_activated = new uint8_t[count];
 	}
 
-	//Now that we have the weights we can set up the nerual net
-	//SetInputs();
-	//SetDesiredOutputs();
 
     return 1;
 }
@@ -106,15 +122,6 @@ unsigned int C_Net::SetSmallRandomWeights(void)
     return 1;
 }
 
-//simply take input parameters(need to be added still)
-//and store the values in the corresponding private variables(also not added yet)
-unsigned int C_Net::SetTrainingParameters(void)
-{
-
-	//I think this is done with the structure
-
-    return 1;
-}
 
 //sets the inputs to the net
 //still need to run UpdateNet command to calculate new output values
@@ -218,7 +225,7 @@ void C_Net::setData(Parameters newData)
 
 unsigned int C_Net::TrainNet(void)
 {
-	
+	Initialize();
 	return 1;
 }
 
