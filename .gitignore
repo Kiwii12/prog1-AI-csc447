@@ -18,3 +18,4 @@ prog1/Debug/prog1.ilk
 prog1/Debug/ANNtrain.obj
 prog1/Debug/anntrain.obj.enc
 *.obj
+*.o

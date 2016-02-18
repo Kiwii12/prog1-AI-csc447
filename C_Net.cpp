@@ -1,5 +1,5 @@
 #include "C_Net.h"
-#include <string.h>
+#include <cstring>
 
 //set values to zero
 //set pointers to null
