@@ -47,7 +47,6 @@ unsigned int C_Net::Initialize()
 	outputs = new double[parm.netLayerNodes[parm.layers -1]];
 
 	desired_outputs = new double[parm.netLayerNodes[parm.layers - 1]];
-	parm.netLayerNodes = new int[parm.layers+1];
 	layers = new T_Layer[parm.layers];
 	//memory allocation for network nodes/layers
 	unsigned int i;

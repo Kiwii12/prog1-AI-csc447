@@ -108,14 +108,15 @@ void Input::setData(char prms[20][50])
 
 	//todo convert prms[6] to int array[layers]
 	parm.netLayerNodes = nullptr;
-	parm.netLayerNodes = new (nothrow) int [parm.layers + 1];
+	parm.netLayerNodes = new (nothrow) int[parm.layers + 1]; 
 
 	string temp = prms[6];
 	istringstream myStringStream(temp);
 	int i = 0;
 	while (getline(myStringStream, temp, ' ') && i < parm.layers + 1)
 	{
-		parm.netLayerNodes[i] = stoi(temp);
+		parm.netLayerNodes[i] = (stoi(temp));
+		cout << "net layer nodes has " << parm.netLayerNodes[i] << endl;
 		i++;
 	}
 

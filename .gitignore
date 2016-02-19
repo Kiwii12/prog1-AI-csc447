@@ -24,3 +24,6 @@ ANNtrain
 ANNtest
 CrossValidation
 *.ilk
+Debug/input.obj.enc
+*.enc
+Debug/prog1.ilk
