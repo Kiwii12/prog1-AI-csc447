@@ -51,17 +51,12 @@ unsigned int C_Net::Initialize()
 	unsigned int count;
 	for (i = 0; i<(parm.layers); i++)
 	{
-		if(i == 0)
-		{
-			count = (parm.netLayerNodes[i] + 1) * parm.netLayerNodes[i+1];
-		}
-		else
-		{
-			count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
-		}
+		
+		count = parm.netLayerNodes[i] * parm.netLayerNodes[i+1];
 		layers[i].weights = new double[count];
+		layers[i].deltaW = new double[count];
 		count = parm.netLayerNodes[i + 1];
-		layers[i].node_activated = new uint8_t[count];
+		layers[i].node_activated = new double[count];
 		layers[i].node_value = new double[count];
 	}
 
@@ -131,14 +126,8 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 	
 	for (i = 0; i<(parm.layers); i++)
 	{
-		if(i == 0)
-		{
-			count = (parm.netLayerNodes[i] + 1) * parm.netLayerNodes[i+1];
-		}
-		else
-		{
-	 		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
-		}
+		
+	 	count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
 
 	 	for (j = 0; j < count; ++j)
 		{
@@ -274,17 +263,9 @@ unsigned int C_Net::UpdateNet(void)
 	for( i=0; i<parm.layers; i++)
 	{
 		//number of nodes in current layer
-		nodes = parm.netLayerNodes[i+1];
+		nodes = parm.netLayerNodes[i];
 		//number of nodes in previous layer
-		if(i == 0)
-		{
-			//special case: input has 1 bias node
-			nodes_prev = (parm.netLayerNodes[i] + 1) * nodes;
-		}
-		else
-		{
-			nodes_prev = parm.netLayerNodes[i] * nodes;
-		}
+		nodes_prev = parm.netLayerNodes[i - 1] * nodes;
 		//loop through nodes
 		for( j=0; j<nodes; j++)
 		{
@@ -328,12 +309,78 @@ unsigned int C_Net::UpdateNet(void)
 //training parameters need to be added still (private variables to class)
 unsigned int C_Net::RunTrainingCycle(void)
 {
-	//Will have to run a forward process then a backward proccess
-	fowardRunData(); // could return a high low or medium signal to give to backwardsTrain
-	backwardsTrain();
-
-	//Might do this after entire loop - that way only done once
-	//SaveWeightsToFile(parm.weightsFile.c_str);
+	int i, j, k, l;
+	int nodes;
+	int nodes_prev;
+	int nodes_next;
+    double delta;
+	double activation;
+	double deltaWSum;
+	//loop through layers
+	for( i=parm.layers - 1; i>=0; i--)
+	{
+		//number of nodes in current layer
+		nodes = parm.netLayerNodes[i + 1];
+		//number of nodes in previous layer
+		nodes_prev = parm.netLayerNodes[i];
+		//number of nodes in next layer
+		if(i < (parm.layers - 1))
+		{
+		    nodes_next = parm.netLayerNodes[i + 2];
+	    }
+	
+		//loop through nodes
+		for( j=0; j<nodes; j++)
+		{
+			
+			//loop through weights
+			for( k=0; k<nodes_prev; k++)
+			{	
+		        activation = layers[i].node_activated[j];
+				//check if output layer
+				if(i == parm.layers - 1)
+				{
+					delta = activation*(1 - activation)*(desired_outputs[j] - activation);
+				}
+				else
+				{
+					deltaWSum = 0;
+					//sum all the deltaW of next layer
+					for( l=0; i<nodes_next; l++)
+					{
+						deltaWSum += layers[i+1].deltaW[l*nodes_next + k];
+					}
+					delta = activation*(1 - activation)*(deltaWSum);
+				}
+				//set deltaW
+				layers[i].deltaW[j*nodes + k] = delta*layers[i].weights[j*nodes + k];
+				
+				//adjust weight (only if input is high)
+				//input layer special case
+				if(i == 0)
+				{
+					if(inputs[k] > 0.5)
+					{
+						layers[i].weights[j*nodes + k] += learning_rate*delta;
+					}
+				}
+				else
+				{
+				    if(layers[i - 1].node_activated[k] > 0.5)
+				    {
+					    layers[i].weights[j*nodes + k] += learning_rate*delta;
+				    }
+				}
+				
+				
+				
+			}
+			
+			
+			
+		}
+	}
+	
     return 1;
 }
 

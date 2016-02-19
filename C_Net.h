@@ -53,9 +53,10 @@ struct T_Layer
     //number of weights will be nodes in layer[i] * nodes in layer[i-1]
     //all weights of node[0], then all weights of node[1], etc
     double* weights;
+	double* deltaW;
     
     //number of each below will be nodes in layer[i]
-    uint8_t* node_activated;
+    double* node_activated;
     double* node_value;
 };
 
