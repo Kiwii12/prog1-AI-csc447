@@ -126,8 +126,29 @@ unsigned int C_Net::SaveWeightsToFile(string filename)
 //not sure if we need/want a parameter or not for this?
 unsigned int C_Net::SetSmallRandomWeights(void)
 {
+	// unsigned int i, j;
+	// unsigned int count;
 
-    return 1;
+	// for (i = 0; i<(parm.layers); i++)
+	// {
+	// 	if(i == 0)
+	// 	{
+	// 		count = (parm.netLayerNodes[i] + 1) * parm.netLayerNodes[i+1];
+	// 	}
+	// 	else
+	// 	{
+	// 		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+	// 	}
+
+	// 	for (j = 0; i < count; ++i)
+	// 	{
+	// 		//creates random weights bewtween [-1,1]
+	// 		layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
+	// 		//cout << layers[i].weights[i] << endl;
+	// 	}
+	// }
+
+  return 1;
 }
 
 float C_Net::findMin(float values[][13], int years, int vals)
