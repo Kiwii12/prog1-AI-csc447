@@ -34,9 +34,7 @@ C_Net::~C_Net()
 //set values and allocate all needed memory
 unsigned int C_Net::Initialize()
 {
-	//Make sure set data is called before this function!!!
-	//Train Function ALWAYS starts with new weights
-	SetSmallRandomWeights();
+	//Make sure setData is called before this function!!!
 
 	//memory allocation
 
@@ -67,6 +65,8 @@ unsigned int C_Net::Initialize()
 		layers[i].node_value = new double[count];
 	}
 
+	//Train Function ALWAYS starts with new weights
+	SetSmallRandomWeights();
 
     return 1;
 }
@@ -126,27 +126,27 @@ unsigned int C_Net::SaveWeightsToFile(string filename)
 //not sure if we need/want a parameter or not for this?
 unsigned int C_Net::SetSmallRandomWeights(void)
 {
-	// unsigned int i, j;
-	// unsigned int count;
+	unsigned int i, j;
+	unsigned int count;
+	
+	for (i = 0; i<(parm.layers); i++)
+	{
+		if(i == 0)
+		{
+			count = (parm.netLayerNodes[i] + 1) * parm.netLayerNodes[i+1];
+		}
+		else
+		{
+	 		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+		}
 
-	// for (i = 0; i<(parm.layers); i++)
-	// {
-	// 	if(i == 0)
-	// 	{
-	// 		count = (parm.netLayerNodes[i] + 1) * parm.netLayerNodes[i+1];
-	// 	}
-	// 	else
-	// 	{
-	// 		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
-	// 	}
-
-	// 	for (j = 0; i < count; ++i)
-	// 	{
-	// 		//creates random weights bewtween [-1,1]
-	// 		layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
-	// 		//cout << layers[i].weights[i] << endl;
-	// 	}
-	// }
+	 	for (j = 0; j < count; ++j)
+		{
+			//creates random weights bewtween [-1,1]
+			layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
+			cout << layers[i].weights[j] << endl;
+		}
+	}
 
   return 1;
 }
