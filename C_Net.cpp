@@ -128,6 +128,7 @@ unsigned int C_Net::LoadWeightsFromFile()
 			cout << layers[i].weights[j];
 		}
 	}
+	fin.close();
     return 1;
 }
 
@@ -137,7 +138,7 @@ unsigned int C_Net::SaveWeightsToFile()
 	int count = 0;
 	int nodes, nodes_prev;
 	ofstream fout;
-	fout.open(parm.weightsFile);
+	fout.open(parm.weightsFile, std::ios_base::trunc);
 	for (int i = 0; i<(parm.layers); i++)
 	{
 
@@ -151,6 +152,7 @@ unsigned int C_Net::SaveWeightsToFile()
 			fout << layers[i].weights[j] << endl;
 		}
 	}
+	fout.close();
 	//make sure to save Weights Array
 
     return 1;
@@ -181,6 +183,7 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 		nodes_prev = parm.netLayerNodes[i];
 		count = nodes*nodes_prev + nodes;
 
+		srand(time(NULL));
 	 	for (j = 0; j < count; ++j)
 		{
 			//creates random weights bewtween [-1,1]
@@ -346,6 +349,7 @@ bool C_Net::readInData()
 		j++;
 
 	}
+	dataFile.close();
 	return false;
 }
 

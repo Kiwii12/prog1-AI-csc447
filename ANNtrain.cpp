@@ -29,6 +29,8 @@ int main(int argc, char** argv)
 
 	net.TrainNet();
 
+	net.SaveWeightsToFile();
+
 	return 0;
 }
 
