@@ -27,7 +27,17 @@ Input::~Input()
 	}
 }
 
-//Reads in the parameter file and puts each value in a separate row in the prms array
+/*******************************************************
+Function: parseParams	
+Author: Allison Bodvig
+
+Description: Reads in the parameter file and puts each 
+value in a separate row in the prms array
+
+Return:
+	returns true if the parameter file was read in
+
+********************************************************/
 //author - Allison
 bool Input::parseParams()
 {
@@ -83,7 +93,6 @@ bool Input::parseParams()
 					line[i] = 0;
 
 				}
-				//cout << prms[j] << endl;
 				j++;
 			}
 		}

@@ -107,6 +107,9 @@ public:
 	unsigned int TestNet(void);
 	unsigned int CrossValidateNet(void);
 
+    //print epoch and RMS
+    void printEpoch(int eNum, double squareError);
+
 private:
     unsigned int num_of_inputs;
     double* inputs;

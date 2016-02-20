@@ -150,14 +150,24 @@ unsigned int C_Net::SaveWeightsToFile(string filename)
     return 1;
 }
 
-//generate small random weights as starting point
-//not sure if we need/want a parameter or not for this?
+/*******************************************************
+Function: SetSmallRandomWeights		
+Author: Allison Bodvig
+
+Description: This function calculates random weights
+between -1 and 1. 
+
+Return:
+	returns 1
+
+********************************************************/
 unsigned int C_Net::SetSmallRandomWeights(void)
 {
 	int i, j;
 	int count;
 	int nodes, nodes_prev;
 	
+	//loop through the number of layers and nodes
 	for (i = 0; i<(parm.layers); i++)
 	{
 		
@@ -169,21 +179,39 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 		{
 			//creates random weights bewtween [-1,1]
 			layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
-			cout << layers[i].weights[j] << endl;
+			//cout << layers[i].weights[j] << endl;
 		}
 	}
 
   return 1;
 }
 
+/*******************************************************
+Function: findMin		
+Author: Allison Bodvig
+
+Description: This function finds the minimum value found
+in the array of values 
+
+Parameters:
+	values		- holds the values that are to be used
+	years 		- number of years of data
+	vals 			- how many indexes in the values array
+
+Return:
+	returns minimum value
+
+********************************************************/
 float C_Net::findMin(float values[][13], int years, int vals)
 {
 	float min = 11;
 
+	//loop through array looking for min
 	for (int i = 0; i < years + 1; ++i)
 	{
 		for (int j = 1; j < vals; j++)
 		{
+			//set new min
 			if (values[i][j] < min)
 				min = values[i][j];
 		}
@@ -192,10 +220,28 @@ float C_Net::findMin(float values[][13], int years, int vals)
 	return min;
 }
 
+
+/*******************************************************
+Function: findMax	
+Author: Allison Bodvig
+
+Description: This function finds the maximum value found
+in the array of values 
+
+Parameters:
+	values		- holds the values that are to be used
+	years 		- number of years of data
+	vals 			- how many indexes in the values array
+
+Return:
+	returns maximum value
+
+********************************************************/
 float C_Net::findMax(float values[][13], int years, int vals)
 {
 	float max = -11;
 
+	//loop through array
 	for (int i = 0; i < years + 1; ++i)
 	{
 		for (int j = 1; j < vals; j++)
@@ -208,11 +254,41 @@ float C_Net::findMax(float values[][13], int years, int vals)
 	return max;
 }
 
+/*******************************************************
+Function: normalize		
+Author: Allison Bodvig
+
+Description: This function finds the minimum values found
+in the list of values 
+
+Parameters:
+	min 			- the minimum value of the data
+	max 			- the maximum value of the data
+	val 			- the value to be normalized
+
+Return:
+	returns normalized value
+
+********************************************************/
+
 float C_Net::normalize(float min, float max, float val)
 {
+	//normalize the data
 	return ((val - min) / (max - min));
 }
 
+
+/*******************************************************
+Function: finMin		
+Author: Allison Bodvig
+
+Description: This function finds the minimum values found
+in the list of values 
+
+Return:
+	returns true or false if data was read in 
+
+********************************************************/
 bool C_Net::readInData()
 {
 	ifstream dataFile;
@@ -225,14 +301,17 @@ bool C_Net::readInData()
 
 	dataFile.open(parm.dataFile);
 
+	//checks for data file
 	if (dataFile.fail())
 	{
 		cout << "Unable to open " << parm.dataFile << endl;;
 	}
 
+	//ignores the first two lines
 	dataFile.ignore(256, '\n');
 	dataFile.ignore(256, '\n');
 
+	//reads in the data
 	while (dataFile.getline(value, 5, ','))
 	{
 		PDSI[j][0] = atof(value);
@@ -243,6 +322,7 @@ bool C_Net::readInData()
 		acres[j][1] = atof(value);
 		//cout << acres[j][1] << endl;
 
+		//reads in each month of data
 		for (int i = 1; i < 13; ++i)
 		{
 			if (i < 12)
@@ -254,9 +334,7 @@ bool C_Net::readInData()
 				dataFile.getline(value, 10, '\n');
 			}
 
-
 			PDSI[j][i] = atof(value);
-			//cout << PDSI[j][i] << endl;
 		}
 
 		j++;
@@ -496,3 +574,13 @@ unsigned int C_Net::CrossValidateNet(void)
 	return 1;
 }
 
+void printEpoch(int eNum, double squareError)
+{
+	//need to calcualte RMS
+	double rms; 
+
+	rms = squareError / eNum;
+	rms = sqrt(rms);
+
+	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
+}
