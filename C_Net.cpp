@@ -469,18 +469,18 @@ unsigned int C_Net::RunTrainingCycle(void)
 				if(k == nodes_prev)
 				{
 					//bias weight
-					layers[i].weights[j*(nodes_prev + 1) + k] += parms.learningRate*delta;		
+					layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;		
 				}
 				else
 				{
 					//input layer special case
 					if(i == 1)
 					{
-						layers[i].weights[j*(nodes_prev + 1) + k] += parms.learningRate*delta*inputs[k];
+						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*inputs[k];
 					}
 					else
 					{
-						layers[i].weights[j*(nodes_prev + 1) + k] += learning_rate*delta*layers[i - 1].node_activation[k];
+						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
 					}			
 				}	
 				
