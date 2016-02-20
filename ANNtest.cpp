@@ -9,8 +9,11 @@ int main(int argc, char** argv)
 	int error;
 	bool b_error;
 
-	if(argc != 2)
+	if (argc != 2)
+	{
+		cout << "Usage: ANNtrain <ParmeterFile>" << endl;
 		return 1;
+	}
 
 	//initialize classes
   C_Net net;
