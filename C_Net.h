@@ -56,7 +56,7 @@ struct T_Layer
 	double* deltaW;
     
     //number of each below will be nodes in layer[i]
-    double* node_activated;
+    double* node_activation;
     double* node_value;
 };
 
@@ -68,7 +68,7 @@ public:
     unsigned int Initialize();
 
 
-    unsigned int Initialize(unsigned int num_of_layers, unsigned int* num_of_nodes_in_each_layer);
+    //unsigned int Initialize(unsigned int num_of_layers, unsigned int* num_of_nodes_in_each_layer);
 
 //I think these function have been done by Allison
     unsigned int LoadWeightsFromFile(string filename);

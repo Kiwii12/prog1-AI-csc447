@@ -18,14 +18,14 @@ C_Net::~C_Net()
 
 	//free dynamically allocated memory
 	unsigned int i;
-	for (i = 0; i<(num_layers - 1); i++)
+	for (i = 0; i<(parm.layers); i++)
 	{
 		delete[] layers[i].weights;
-		delete[] layers[i].node_activated;
+		delete[] layers[i].deltaW;
+		delete[] layers[i].node_activation;
 		delete[] layers[i].node_value;
 	}
 	delete[] layers;
-	delete[] parm.netLayerNodes;
 	delete[] desired_outputs;
 	delete[] outputs;
 	delete[] inputs;
@@ -42,31 +42,36 @@ unsigned int C_Net::Initialize()
 	inputs = new double[parm.netLayerNodes[0]];
 
 	//output will be the number of nodes in the last layer
-	outputs = new double[parm.netLayerNodes[parm.layers -1]];
+	outputs = new double[parm.netLayerNodes[parm.layers]];
 
-	desired_outputs = new double[parm.netLayerNodes[parm.layers - 1]];
+	desired_outputs = new double[parm.netLayerNodes[parm.layers]];
 	layers = new T_Layer[parm.layers];
 	//memory allocation for network nodes/layers
-	unsigned int i;
-	unsigned int count;
+	int i;
+	int count;
+	int nodes, nodes_prev;
+	
 	for (i = 0; i<(parm.layers); i++)
 	{
-		
-		count = parm.netLayerNodes[i] * parm.netLayerNodes[i+1];
+		nodes_prev = parm.netLayerNodes[i];
+		nodes = parm.netLayerNodes[i+1];
+		//account for bias weights
+		count = nodes*nodes_prev + nodes;
 		layers[i].weights = new double[count];
 		layers[i].deltaW = new double[count];
-		count = parm.netLayerNodes[i + 1];
-		layers[i].node_activated = new double[count];
-		layers[i].node_value = new double[count];
+		
+		layers[i].node_activation = new double[nodes];
+		layers[i].node_value = new double[nodes];
 	}
 
 	//Train Function ALWAYS starts with new weights
 	SetSmallRandomWeights();
 
-    return 1;
+    return 0;
 }
 
 //set values and allocate all needed memory
+/*
 unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_nodes_in_each_layer)
 {
 	if(num_of_layers+1 < 3)
@@ -97,6 +102,7 @@ unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_
 
     return 0;
 }
+*/
 
 //load weights into memory
 //return an error if file does not exist
@@ -121,13 +127,16 @@ unsigned int C_Net::SaveWeightsToFile(string filename)
 //not sure if we need/want a parameter or not for this?
 unsigned int C_Net::SetSmallRandomWeights(void)
 {
-	unsigned int i, j;
-	unsigned int count;
+	int i, j;
+	int count;
+	int nodes, nodes_prev;
 	
 	for (i = 0; i<(parm.layers); i++)
 	{
 		
-	 	count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+		nodes = parm.netLayerNodes[i+1];
+		nodes_prev = parm.netLayerNodes[i];
+		count = nodes*nodes_prev + nodes;
 
 	 	for (j = 0; j < count; ++j)
 		{
@@ -263,9 +272,9 @@ unsigned int C_Net::UpdateNet(void)
 	for( i=0; i<parm.layers; i++)
 	{
 		//number of nodes in current layer
-		nodes = parm.netLayerNodes[i];
+		nodes = parm.netLayerNodes[i + 1];
 		//number of nodes in previous layer
-		nodes_prev = parm.netLayerNodes[i - 1] * nodes;
+		nodes_prev = parm.netLayerNodes[i];
 		//loop through nodes
 		for( j=0; j<nodes; j++)
 		{
@@ -280,29 +289,25 @@ unsigned int C_Net::UpdateNet(void)
 					//input layer is special case
 					//weight is j*nodes + k
 					//wieght is (current node)*nodes + (current weight)
-					layers[i].node_value[j] += inputs[k]*layers[i].weights[j*nodes + k];
+					//+1 to account for bias weight
+					layers[i].node_value[j] += inputs[k]*layers[i].weights[j*(nodes_prev+1) + k];
 				}
-				else if( layers[i-1].node_activated[j] == 1)
+				else if( layers[i-1].node_activation[j] >= 0.5)
 				{
-					layers[i].node_value[j] += layers[i].weights[j*nodes + k];
+					layers[i].node_value[j] += layers[i].weights[j*(nodes_prev+1) + k];
 				}
 				
 			}
+			//process bias weight
+			layers[i].node_value[j] += layers[i].weights[j*(nodes_prev+1) + k];
 			
 			//now use sigmoid function
-			if(1.0/(1.0 + pow(2.7182818284, (-1.0*layers[i].node_value[j]))) > 0.5)
-			{
-				layers[i].node_activated[j] = 1;
-			}
-			else
-			{
-				layers[i].node_activated[j] = 0;
-			}
+			layers[i].node_activation[j] = (1.0/(1.0 + pow(2.7182818284, (-1.0*layers[i].node_value[j]))));
 			
 		}
 	}
 	
-    return 1;
+    return 0;
 }
 
 //runs a single iteration of the generalized delta learning rule
@@ -317,16 +322,16 @@ unsigned int C_Net::RunTrainingCycle(void)
 	double activation;
 	double deltaWSum;
 	//loop through layers
-	for( i=parm.layers - 1; i>=0; i--)
+	for( i=parm.layers; i>0; i--)
 	{
 		//number of nodes in current layer
-		nodes = parm.netLayerNodes[i + 1];
+		nodes = parm.netLayerNodes[i];
 		//number of nodes in previous layer
-		nodes_prev = parm.netLayerNodes[i];
-		//number of nodes in next layer
-		if(i < (parm.layers - 1))
+		nodes_prev = parm.netLayerNodes[i - 1];
+		//number of nodes in next layer (unless output layer)
+		if(i < (parm.layers))
 		{
-		    nodes_next = parm.netLayerNodes[i + 2];
+		    nodes_next = parm.netLayerNodes[i + 1];
 	    }
 	
 		//loop through nodes
@@ -334,11 +339,11 @@ unsigned int C_Net::RunTrainingCycle(void)
 		{
 			
 			//loop through weights
-			for( k=0; k<nodes_prev; k++)
+			for( k=0; k<(nodes_prev + 1); k++)
 			{	
-		        activation = layers[i].node_activated[j];
+		        activation = layers[i].node_activation[j];
 				//check if output layer
-				if(i == parm.layers - 1)
+				if(i == parm.layers)
 				{
 					delta = activation*(1 - activation)*(desired_outputs[j] - activation);
 				}
@@ -348,40 +353,40 @@ unsigned int C_Net::RunTrainingCycle(void)
 					//sum all the deltaW of next layer
 					for( l=0; i<nodes_next; l++)
 					{
-						deltaWSum += layers[i+1].deltaW[l*nodes_next + k];
+						deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
 					}
 					delta = activation*(1 - activation)*(deltaWSum);
 				}
 				//set deltaW
-				layers[i].deltaW[j*nodes + k] = delta*layers[i].weights[j*nodes + k];
+				layers[i].deltaW[j*(nodes_prev + 1) + k] = delta*layers[i].weights[j*(nodes_prev + 1) + k];
 				
-				//adjust weight (only if input is high)
-				//input layer special case
-				if(i == 0)
+				//adjust weight
+				if(k == nodes_prev)
 				{
-					if(inputs[k] > 0.5)
-					{
-						layers[i].weights[j*nodes + k] += learning_rate*delta;
-					}
+					//bias weight
+					layers[i].weights[j*(nodes_prev + 1) + k] += parms.learningRate*delta;		
 				}
 				else
 				{
-				    if(layers[i - 1].node_activated[k] > 0.5)
-				    {
-					    layers[i].weights[j*nodes + k] += learning_rate*delta;
-				    }
-				}
-				
-				
+					//input layer special case
+					if(i == 1)
+					{
+						layers[i].weights[j*(nodes_prev + 1) + k] += parms.learningRate*delta*inputs[k];
+					}
+					else
+					{
+						layers[i].weights[j*(nodes_prev + 1) + k] += learning_rate*delta*layers[i - 1].node_activation[k];
+					}			
+				}	
 				
 			}
-			
-			
-			
+				
 		}
+		
 	}
 	
-    return 1;
+	
+    return 0;
 }
 
 void C_Net::fullTrainingRun() 
