@@ -213,7 +213,7 @@ Return:
 ********************************************************/
 float C_Net::findMin(float values[][13], int years, int vals)
 {
-	float min = 11;
+	float min = 1000000;
 
 	//loop through array looking for min
 	for (int i = 0; i < years + 1; ++i)
@@ -303,7 +303,7 @@ bool C_Net::readInData()
 	ifstream dataFile;
 	float PDSI[100][13] = { 0 };
 	float NormPDSI[100][13] = { 0 };
-	float acres[100][2] = { 0 };
+	float acres[100][13] = { 0 };
 	int j = 0;
 	char value[15];
 	int years_data, years_acreage, months_pdsi;
@@ -352,6 +352,32 @@ bool C_Net::readInData()
 	}
 	dataFile.close();
 	
+	min = findMin(PDSI, j, 13);
+	max = findMax(PDSI, j, 13);
+
+	for (int i = 0; i < j; ++i)
+	{
+		for (int k = 1; k < 13; ++k)
+		{
+			PDSI[i][k] = normalize(min, max, PDSI[i][k]);
+			//cout << PDSI[i][k] << " ";
+		}
+		//cout << endl;
+	}
+
+	min = findMin(acres, j, 2);
+	max = findMax(acres, j, 2);
+
+	for (int i = 0; i < j; ++i)
+	{
+		for (int k = 1; k < 2; ++k)
+		{
+			acres[i][k] = normalize(min, max, acres[i][k]);
+			cout << acres[i][k] << endl;
+		}
+	}
+
+
 	//put data in class variables
     years_data = j;
     years_acreage = j - 1;
@@ -577,6 +603,7 @@ void C_Net::setData(Parameters newData)
 unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
+	readInData();
 	//fullTrainingRun();
 	SaveWeightsToFile();
 	return 1;
