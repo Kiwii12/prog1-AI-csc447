@@ -71,8 +71,8 @@ public:
     //unsigned int Initialize(unsigned int num_of_layers, unsigned int* num_of_nodes_in_each_layer);
 
 //I think these function have been done by Allison
-    unsigned int LoadWeightsFromFile(string filename);
-    unsigned int SaveWeightsToFile(string filename);
+    unsigned int LoadWeightsFromFile();
+    unsigned int SaveWeightsToFile();
     unsigned int SetSmallRandomWeights(void);
 
 	//Nomralization functions

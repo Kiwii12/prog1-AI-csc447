@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-	int error;
+	//int error;
 	bool b_error;
 
 	if(argc != 2)
@@ -25,6 +25,8 @@ int main(int argc, char** argv)
 	net.setData(parameters.getData());
 
 	net.TrainNet();
+
+	net.SaveWeightsToFile();
 
 	return 0;
 }

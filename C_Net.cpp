@@ -18,7 +18,7 @@ C_Net::~C_Net()
 
 	//free dynamically allocated memory
 	unsigned int i;
-	for (i = 0; i<(parm.layers); i++)
+	for (i = 0; (int)i<(parm.layers); i++)
 	{
 		delete[] layers[i].weights;
 		delete[] layers[i].deltaW;
@@ -108,15 +108,18 @@ unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_
 //return an error if file does not exist
 //return different error if number of weights in file
 //    do not match expected number of weights
-unsigned int C_Net::LoadWeightsFromFile(string filename)
+unsigned int C_Net::LoadWeightsFromFile()
 {
 	int count = 0;
+	int nodes, nodes_prev;
 	ifstream fin;
-	fin.open(filename);
+	fin.open(parm.weightsFile);
 	for (int i = 0; i<(parm.layers); i++)
 	{
 
-		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+		nodes = parm.netLayerNodes[i + 1];
+		nodes_prev = parm.netLayerNodes[i];
+		count = nodes*nodes_prev + nodes;
 
 		for (int j = 0; j < count; ++j)
 		{
@@ -129,15 +132,18 @@ unsigned int C_Net::LoadWeightsFromFile(string filename)
 }
 
 //save weights to file
-unsigned int C_Net::SaveWeightsToFile(string filename)
+unsigned int C_Net::SaveWeightsToFile()
 {
 	int count = 0;
+	int nodes, nodes_prev;
 	ofstream fout;
-	fout.open(filename);
+	fout.open(parm.weightsFile);
 	for (int i = 0; i<(parm.layers); i++)
 	{
 
-		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+		nodes = parm.netLayerNodes[i + 1];
+		nodes_prev = parm.netLayerNodes[i];
+		count = nodes*nodes_prev + nodes;
 
 		for (int j = 0; j < count; ++j)
 		{
