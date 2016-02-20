@@ -11,10 +11,10 @@ C_Net::C_Net()
 //deallocate memory used by non-null pointers
 C_Net::~C_Net()
 {
-	if (parm.netLayerNodes != nullptr)
-	{
-		delete parm.netLayerNodes;
-	}
+	// if (parm.netLayerNodes != nullptr)
+	// {
+	// 	delete[] parm.netLayerNodes;
+	// }
 
 	//free dynamically allocated memory
 	unsigned int i;
