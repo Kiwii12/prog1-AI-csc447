@@ -70,39 +70,6 @@ unsigned int C_Net::Initialize()
     return 0;
 }
 
-//set values and allocate all needed memory
-/*
-unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_nodes_in_each_layer)
-{
-	if(num_of_layers+1 < 3)
-		return 1;
-	//set variables
-	num_of_inputs = parm.netLayerNodes[0];
-	num_of_outputs = parm.netLayerNodes[parm.layers - 1];
-	num_layers = parm.layers+1;
-	//memory allocation
-	inputs = new double [num_of_inputs];
-	outputs = new double [num_of_outputs];
-	desired_outputs = new double [num_of_outputs];
-	parm.netLayerNodes = new int [num_layers];
-	layers = new T_Layer [num_layers - 1];
-	//memory allocation for network nodes/layers
-	unsigned int i;
-	unsigned int count;
-	for( i=0; i<(num_layers - 1); i++)
-	{
-		count = parm.netLayerNodes[i]*parm.netLayerNodes[i+1];
-		layers[i].weights = new double [count];
-		count = parm.netLayerNodes[i+1];
-		layers[i].node_activated = new uint8_t [count];
-	}
-
-
-
-
-    return 0;
-}
-*/
 
 //load weights into memory
 //return an error if file does not exist
@@ -279,7 +246,6 @@ Return:
 	returns normalized value
 
 ********************************************************/
-
 float C_Net::normalize(float min, float max, float val)
 {
 	//normalize the data
@@ -390,9 +356,9 @@ bool C_Net::readInData()
 
 //sets the inputs to the net
 //still need to run UpdateNet command to calculate new output values
-unsigned int C_Net::SetInputs(double* inputs_array, unsigned int length)
+unsigned int C_Net::SetInputs(int Count)
 {
-
+	//inputArray = arrayOfInputs[count];
     return 1;
 }
 
@@ -541,14 +507,16 @@ unsigned int C_Net::RunTrainingCycle(void)
 void C_Net::fullTrainingRun() 
 {
 	int numberOfYears; // = number of years of training data in array
+	int errorSum = 0;
 	for (int i = 0; i < parm.numberTrainingEpochs; i++)
 	{
 		//we need a double array of the training data
 		//each row of the array will have its pdia and burn acrage data
-		//randomizeOrderOfDataArray()
+		randomizeTrainingData();
 		for (int j = 0; j < numberOfYears; j++)
 		{
 			//set training cycle to dataArray[j]
+			SetInputs(j);
 			RunTrainingCycle();
 		}
 
@@ -576,6 +544,10 @@ void C_Net::fowardRunData()
 		//burned
 	}
 
+}
+
+void C_Net::randomizeTrainingData()
+{
 }
 
 /**************************************************************************//**

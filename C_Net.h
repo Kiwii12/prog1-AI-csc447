@@ -84,7 +84,7 @@ public:
 	bool readInData();
 
 
-    unsigned int SetInputs(double* inputs_array, unsigned int length);
+    unsigned int SetInputs(int count);
     unsigned int GetOutputs(double* outputs_array, unsigned int length);
     unsigned int SetDesiredOutputs(double* desired_outputs_array, unsigned int length);
 
@@ -96,6 +96,9 @@ public:
 
 	//Does a test run of the net
 	void fowardRunData();
+
+	//Randomize training data for epic
+	void randomizeTrainingData();
 
 	//revers process though net for training
 	void backwardsTrain();
