@@ -110,14 +110,41 @@ unsigned int C_Net::Initialize(unsigned int num_of_layers, unsigned int* num_of_
 //    do not match expected number of weights
 unsigned int C_Net::LoadWeightsFromFile(string filename)
 {
+	int count = 0;
+	ifstream fin;
+	fin.open(filename);
+	for (int i = 0; i<(parm.layers); i++)
+	{
 
+		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+
+		for (int j = 0; j < count; ++j)
+		{
+			//creates random weights bewtween [-1,1]
+			fin >> layers[i].weights[j];
+			cout << layers[i].weights[j];
+		}
+	}
     return 1;
 }
 
 //save weights to file
 unsigned int C_Net::SaveWeightsToFile(string filename)
 {
+	int count = 0;
+	ofstream fout;
+	fout.open(filename);
+	for (int i = 0; i<(parm.layers); i++)
+	{
 
+		count = parm.netLayerNodes[i] * parm.netLayerNodes[i + 1];
+
+		for (int j = 0; j < count; ++j)
+		{
+			//creates random weights bewtween [-1,1]
+			fout << layers[i].weights[j] << endl;
+		}
+	}
 	//make sure to save Weights Array
 
     return 1;
