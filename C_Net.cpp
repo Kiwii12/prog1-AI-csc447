@@ -569,6 +569,8 @@ void C_Net::setData(Parameters newData)
 unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
+	fullTrainingRun();
+	SaveWeightsToFile();
 	return 1;
 }
 
