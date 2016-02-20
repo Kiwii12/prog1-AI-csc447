@@ -430,7 +430,7 @@ unsigned int C_Net::UpdateNet(void)
 		}
 	}
 	
-    return 0;
+  return 0;
 }
 
 //runs a single iteration of the generalized delta learning rule

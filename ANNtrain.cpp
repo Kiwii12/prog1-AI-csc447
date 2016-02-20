@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 	//load parameters
 	b_error = parameters.parseParams();
 	if(b_error == false)
-		return 2;
+		exit(2);
 
 	//Passes ParamFile to the net
 	net.setData(parameters.getData());
