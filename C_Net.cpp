@@ -306,6 +306,7 @@ bool C_Net::readInData()
 	float acres[100][2] = { 0 };
 	int j = 0;
 	char value[15];
+	int years_data, years_acreage, months_pdsi;
 	float min, max;
 
 	dataFile.open(parm.dataFile);
@@ -350,6 +351,13 @@ bool C_Net::readInData()
 
 	}
 	dataFile.close();
+	
+	//put data in class variables
+    years_data = j;
+    years_acreage = j - 1;
+    months_pdsi = 12*(j - 1) + parm.endMonth;
+	
+	
 	return false;
 }
 
@@ -569,7 +577,7 @@ void C_Net::setData(Parameters newData)
 unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
-	fullTrainingRun();
+	//fullTrainingRun();
 	SaveWeightsToFile();
 	return 1;
 }

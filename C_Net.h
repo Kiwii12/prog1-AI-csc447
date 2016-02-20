@@ -124,6 +124,12 @@ private:
     //this should be num_layers - 1 (input layer has no weights)
     //number of weights in each layer is nodes in layer * nodes in previous layer
     T_Layer* layers;
+	
+	int sets_training_data;
+	double* training_data;
+	
+	int sets_testing_data;
+	double* testing_data;
 
     //training parameters variables need to be added here as well
     //double learning_rate //<-- is learning_rate the only one?

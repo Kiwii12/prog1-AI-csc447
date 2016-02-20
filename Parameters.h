@@ -1,4 +1,3 @@
-#pragma once
 #include <cstdint>
 #include <iostream>
 #include <fstream>
@@ -10,7 +9,7 @@
 using namespace std;
 
 #ifndef __PARAMETERS__H__
-#define __PARAMETERS__N__
+#define __PARAMETERS__H__
 struct Parameters
 {
 	string paramFile;
