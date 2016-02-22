@@ -348,7 +348,7 @@ bool C_Net::readInData()
 		for (int k = 1; k < 2; ++k)
 		{
 			acres[i][k] = normalize(min, max, acres[i][k]);
-			cout << acres[i][k] << endl;
+			//cout << acres[i][k] << endl;
 		}
 	}
 
@@ -665,8 +665,21 @@ unsigned int C_Net::TestNet(void)
 
 unsigned int C_Net::CrossValidateNet(void)
 {
+	Initialize();
+	readInData();
+	//normalized data is in PDSI and acres arrays
+	//take data and loop through removing one and training the rest
+	//then test the one point that was not used for training
+	/***************
+	for (int i = 0; i < numyears; i++)
+	{
+		//make new weights file for each training call??
+		train on data with skipping index i
+		test index i with results from training
+	}
+	print results
 
-	return 1;
+	*****************/
 }
 
 void printEpoch(int eNum, double squareError)
@@ -678,4 +691,24 @@ void printEpoch(int eNum, double squareError)
 	rms = sqrt(rms);
 
 	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
+}
+
+
+void printResults()
+{
+
+	cout << "Year, Actual, Predicted" << endl;
+	/*************
+	for (int i = 0; i < years; i++)
+	{
+		cout << year << ", " << actual, << ", " << predicted;
+		if (predicted != actual)
+			cout << ", *";
+
+		cout << endl;
+	}
+
+
+	***************/
+
 }
