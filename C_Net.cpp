@@ -50,7 +50,7 @@ unsigned int C_Net::Initialize()
 	int i;
 	int count;
 	int nodes, nodes_prev;
-	
+
 	for (i = 0; i<(parm.layers); i++)
 	{
 		nodes_prev = parm.netLayerNodes[i];
@@ -59,7 +59,7 @@ unsigned int C_Net::Initialize()
 		count = nodes*nodes_prev + nodes;
 		layers[i].weights = new double[count];
 		layers[i].deltaW = new double[count];
-		
+
 		layers[i].node_activation = new double[nodes];
 		layers[i].node_value = new double[nodes];
 	}
@@ -126,11 +126,11 @@ unsigned int C_Net::SaveWeightsToFile()
 }
 
 /*******************************************************
-Function: SetSmallRandomWeights		
+Function: SetSmallRandomWeights
 Author: Allison Bodvig
 
 Description: This function calculates random weights
-between -1 and 1. 
+between -1 and 1.
 
 Return:
 	returns 1
@@ -141,11 +141,11 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 	int i, j;
 	int count;
 	int nodes, nodes_prev;
-	
+
 	//loop through the number of layers and nodes
 	for (i = 0; i<(parm.layers); i++)
 	{
-		
+
 		nodes = parm.netLayerNodes[i+1];
 		nodes_prev = parm.netLayerNodes[i];
 		count = nodes*nodes_prev + nodes;
@@ -163,11 +163,11 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 }
 
 /*******************************************************
-Function: findMin		
+Function: findMin
 Author: Allison Bodvig
 
 Description: This function finds the minimum value found
-in the array of values 
+in the array of values
 
 Parameters:
 	values		- holds the values that are to be used
@@ -198,11 +198,11 @@ float C_Net::findMin(float values[][13], int years, int vals)
 
 
 /*******************************************************
-Function: findMax	
+Function: findMax
 Author: Allison Bodvig
 
 Description: This function finds the maximum value found
-in the array of values 
+in the array of values
 
 Parameters:
 	values		- holds the values that are to be used
@@ -231,11 +231,11 @@ float C_Net::findMax(float values[][13], int years, int vals)
 }
 
 /*******************************************************
-Function: normalize		
+Function: normalize
 Author: Allison Bodvig
 
 Description: This function finds the minimum values found
-in the list of values 
+in the list of values
 
 Parameters:
 	min 			- the minimum value of the data
@@ -254,25 +254,28 @@ float C_Net::normalize(float min, float max, float val)
 
 
 /*******************************************************
-Function: finMin		
+Function: finMin
 Author: Allison Bodvig
 
 Description: This function finds the minimum values found
-in the list of values 
+in the list of values
 
 Return:
-	returns true or false if data was read in 
+	returns true or false if data was read in
 
 ********************************************************/
 bool C_Net::readInData()
 {
 	ifstream dataFile;
 	float PDSI[100][13] = { 0 };
-	float NormPDSI[100][13] = { 0 };
+	//float NormPDSI[100][13] = { 0 };
 	float acres[100][13] = { 0 };
-	int j = 0;
+	int i, j, k, m;
+	int c_m, c_y;
+	j = 0;
 	char value[15];
 	int years_data, years_acreage, months_pdsi;
+	int start_year, start_year_tmp, num_data_sets;
 	float min, max;
 
 	dataFile.open(parm.dataFile);
@@ -317,7 +320,7 @@ bool C_Net::readInData()
 
 	}
 	dataFile.close();
-	
+
 	min = findMin(PDSI, j, 13);
 	max = findMax(PDSI, j, 13);
 
@@ -348,8 +351,46 @@ bool C_Net::readInData()
     years_data = j;
     years_acreage = j - 1;
     months_pdsi = 12*(j - 1) + parm.endMonth;
-	
-	
+
+    start_year = parm.burnedAcreage;
+    start_year_tmp = (int)(parm.PDSIdata - parm.endMonth + 11)/(int)12;
+    if(start_year_tmp > start_year)
+    {
+        start_year = start_year_tmp;
+    }
+    num_data_sets = years_acreage - start_year;
+
+    sets_training_data = num_data_sets;
+    //m = number of inputs
+    m = parm.netLayerNodes[0];
+    training_data = new double[sets_training_data*m];
+
+    for(i=start_year; i < years_acreage; i++)
+    {
+        //answer first
+        training_data[m*(i - start_year) + 0] = acres[i][1];
+
+        //now months of PDSI data
+        c_m = parm.endMonth;
+        c_y = i;
+        for(j=0; j < parm.PDSIdata; j++)
+        {
+            training_data[m*(i - start_year) + j + 1] = PDSI[c_y][c_m];
+            c_m--;
+            if(c_m == 0)
+            {
+                c_m = 12;
+                c_y--;
+            }
+        }
+        for(j=0; j < parm.burnedAcreage; j++)
+        {
+            training_data[m*(i - start_year) + j + parm.PDSIdata + 1] = acres[i - 1 - j][1];
+        }
+
+    }
+
+
 	return false;
 }
 
@@ -411,17 +452,17 @@ unsigned int C_Net::UpdateNet(void)
 				{
 					layers[i].node_value[j] += layers[i].weights[j*(nodes_prev+1) + k];
 				}
-				
+
 			}
 			//process bias weight
 			layers[i].node_value[j] += layers[i].weights[j*(nodes_prev+1) + k];
-			
+
 			//now use sigmoid function
 			layers[i].node_activation[j] = (1.0/(1.0 + pow(2.7182818284, (-1.0*layers[i].node_value[j]))));
-			
+
 		}
 	}
-	
+
   return 0;
 }
 
@@ -448,14 +489,14 @@ unsigned int C_Net::RunTrainingCycle(void)
 		{
 		    nodes_next = parm.netLayerNodes[i + 1];
 	    }
-	
+
 		//loop through nodes
 		for( j=0; j<nodes; j++)
 		{
-			
+
 			//loop through weights
 			for( k=0; k<(nodes_prev + 1); k++)
-			{	
+			{
 		        activation = layers[i].node_activation[j];
 				//check if output layer
 				if(i == parm.layers)
@@ -474,12 +515,12 @@ unsigned int C_Net::RunTrainingCycle(void)
 				}
 				//set deltaW
 				layers[i].deltaW[j*(nodes_prev + 1) + k] = delta*layers[i].weights[j*(nodes_prev + 1) + k];
-				
+
 				//adjust weight
 				if(k == nodes_prev)
 				{
 					//bias weight
-					layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;		
+					layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;
 				}
 				else
 				{
@@ -491,20 +532,20 @@ unsigned int C_Net::RunTrainingCycle(void)
 					else
 					{
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
-					}			
-				}	
-				
+					}
+				}
+
 			}
-				
+
 		}
-		
+
 	}
-	
-	
+
+
     return 0;
 }
 
-void C_Net::fullTrainingRun() 
+void C_Net::fullTrainingRun()
 {
 	int numberOfYears; // = number of years of training data in array
 	int errorSum = 0;
@@ -540,7 +581,7 @@ void C_Net::fowardRunData()
 	{
 		//take the value of the layer before it multiplied by the weight connecting
 		//it
-		//Add these all together... but keep a different tally for PDSI and acrees 
+		//Add these all together... but keep a different tally for PDSI and acrees
 		//burned
 	}
 
@@ -561,7 +602,7 @@ void C_Net::randomizeTrainingData()
 void C_Net::backwardsTrain()
 {
 	//This has to back up though the array, adding the training value to weights
-	//that led to sucess and subtracting from weights that led to falure <- if 
+	//that led to sucess and subtracting from weights that led to falure <- if
 	//there was a falure.
 	UpdateNet();
 
@@ -583,20 +624,20 @@ unsigned int C_Net::TrainNet(void)
 
 unsigned int C_Net::TestNet(void)
 {
-	
+
 	return 1;
 }
 
 unsigned int C_Net::CrossValidateNet(void)
 {
-	
+
 	return 1;
 }
 
 void printEpoch(int eNum, double squareError)
 {
 	//need to calcualte RMS
-	double rms; 
+	double rms;
 
 	rms = squareError / eNum;
 	rms = sqrt(rms);
