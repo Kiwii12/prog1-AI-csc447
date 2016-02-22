@@ -7,7 +7,7 @@
 ## This is where a target gets it's source files
 SOURCE_FILES_ANN = ANNtrain.cpp C_Net.cpp Input.cpp
 SOURCE_FILES_ANNT = ANNtest.cpp C_Net.cpp Input.cpp
-SOURCE_FILES_Cross = ANNtest.cpp C_Net.cpp Input.cpp
+SOURCE_FILES_Cross = CrossValidate.cpp C_Net.cpp Input.cpp
 
 
 CPP_COMPILER=g++

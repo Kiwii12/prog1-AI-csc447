@@ -113,6 +113,9 @@ public:
     //print epoch and RMS
     void printEpoch(int eNum, double squareError);
 
+    //print results to the screen
+    void printResults(); 
+
 private:
     unsigned int num_of_inputs;
     double* inputs;
