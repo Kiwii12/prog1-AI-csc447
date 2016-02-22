@@ -54,7 +54,7 @@ struct T_Layer
     //all weights of node[0], then all weights of node[1], etc
     double* weights;
 	double* deltaW;
-    
+
     //number of each below will be nodes in layer[i]
     double* node_activation;
     double* node_value;
@@ -105,7 +105,9 @@ public:
 
 	//Needs to get the param file data <- pulled from ANN.h
 	void setData(Parameters newData);
-	
+
+	void randomizeTrainingSets(void);
+
 	unsigned int TrainNet(void);
 	unsigned int TestNet(void);
 	unsigned int CrossValidateNet(void);
@@ -127,12 +129,12 @@ private:
     //this should be num_layers - 1 (input layer has no weights)
     //number of weights in each layer is nodes in layer * nodes in previous layer
     T_Layer* layers;
-	
+
 	int sets_training_data;
-	double* training_data;
-	
+	double** training_data;
+
 	int sets_testing_data;
-	double* testing_data;
+	double** testing_data;
 
     //training parameters variables need to be added here as well
     //double learning_rate //<-- is learning_rate the only one?

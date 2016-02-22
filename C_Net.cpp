@@ -1,5 +1,6 @@
 #include "C_Net.h"
 #include <cstring>
+#include <algorithm>
 
 //set values to zero
 //set pointers to null
@@ -17,18 +18,23 @@ C_Net::~C_Net()
 	// }
 
 	//free dynamically allocated memory
-	unsigned int i;
-	for (i = 0; (int)i<(parm.layers); i++)
+	int i;
+	for (i = 0; i<parm.layers; i++)
 	{
 		delete[] layers[i].weights;
 		delete[] layers[i].deltaW;
 		delete[] layers[i].node_activation;
 		delete[] layers[i].node_value;
 	}
+	for( i=0; i<sets_training_data; i++)
+    {
+        delete[] training_data[i];
+    }
+	delete[] training_data;
 	delete[] layers;
 	delete[] desired_outputs;
 	delete[] outputs;
-	delete[] inputs;
+
 }
 
 //set values and allocate all needed memory
@@ -39,7 +45,7 @@ unsigned int C_Net::Initialize()
 	//memory allocation
 
 	//inputs will be the number of nodes in the first layer
-	inputs = new double[parm.netLayerNodes[0]];
+	//inputs = new double[parm.netLayerNodes[0]];
 
 	//output will be the number of nodes in the last layer
 	outputs = new double[parm.netLayerNodes[parm.layers]];
@@ -270,11 +276,11 @@ bool C_Net::readInData()
 	float PDSI[100][13] = { 0 };
 	//float NormPDSI[100][13] = { 0 };
 	float acres[100][13] = { 0 };
-	int i, j, k, m;
+	int i, j, m;
 	int c_m, c_y;
 	j = 0;
 	char value[15];
-	int years_data, years_acreage, months_pdsi;
+	int years_acreage;
 	int start_year, start_year_tmp, num_data_sets;
 	float min, max;
 
@@ -348,9 +354,7 @@ bool C_Net::readInData()
 
 
 	//put data in class variables
-    years_data = j;
     years_acreage = j - 1;
-    months_pdsi = 12*(j - 1) + parm.endMonth;
 
     start_year = parm.burnedAcreage;
     start_year_tmp = (int)(parm.PDSIdata - parm.endMonth + 11)/(int)12;
@@ -362,20 +366,24 @@ bool C_Net::readInData()
 
     sets_training_data = num_data_sets;
     //m = number of inputs
-    m = parm.netLayerNodes[0];
-    training_data = new double[sets_training_data*m];
+    m = parm.netLayerNodes[0] + 1;
+    training_data = new double*[sets_training_data];
+    for( i=0; i<sets_training_data; i++)
+    {
+        training_data[i] = new double[m];
+    }
 
     for(i=start_year; i < years_acreage; i++)
     {
         //answer first
-        training_data[m*(i - start_year) + 0] = acres[i][1];
+        training_data[i - start_year][0] = acres[i][1];
 
         //now months of PDSI data
         c_m = parm.endMonth;
         c_y = i;
         for(j=0; j < parm.PDSIdata; j++)
         {
-            training_data[m*(i - start_year) + j + 1] = PDSI[c_y][c_m];
+            training_data[i - start_year][j + 1] = PDSI[c_y][c_m];
             c_m--;
             if(c_m == 0)
             {
@@ -385,13 +393,37 @@ bool C_Net::readInData()
         }
         for(j=0; j < parm.burnedAcreage; j++)
         {
-            training_data[m*(i - start_year) + j + parm.PDSIdata + 1] = acres[i - 1 - j][1];
+            training_data[i - start_year][j + 1 + parm.PDSIdata] = acres[i - 1 - j][1];
         }
 
     }
 
 
 	return false;
+}
+
+
+void C_Net::randomizeTrainingSets(void)
+{
+    //randomly shuffle the training data using Knuth shuffle
+    int i, j, m;
+    double* tempA;
+    m = parm.netLayerNodes[0] + 1;
+    srand(time(NULL));
+    tempA = new double[m];
+    for(i=0; i<sets_training_data - 1; i++)
+    {
+        //j = random integer
+        //0 <= j <= n-i
+        j = rand() % (sets_training_data - i);
+
+        //swap a[i] and a[i+j]
+        memcpy(tempA, training_data[i], sizeof(double)*m);
+        memcpy(training_data[i], training_data[i+j], sizeof(double)*m);
+        memcpy(training_data[i+j], tempA, sizeof(double)*m);
+    }
+
+    delete[] tempA;
 }
 
 
@@ -465,6 +497,8 @@ unsigned int C_Net::UpdateNet(void)
 
   return 0;
 }
+
+
 
 //runs a single iteration of the generalized delta learning rule
 //training parameters need to be added still (private variables to class)
@@ -545,23 +579,28 @@ unsigned int C_Net::RunTrainingCycle(void)
     return 0;
 }
 
+
 void C_Net::fullTrainingRun()
 {
-	int numberOfYears; // = number of years of training data in array
-	int errorSum = 0;
-	for (int i = 0; i < parm.numberTrainingEpochs; i++)
-	{
-		//we need a double array of the training data
-		//each row of the array will have its pdia and burn acrage data
-		randomizeTrainingData();
-		for (int j = 0; j < numberOfYears; j++)
-		{
-			//set training cycle to dataArray[j]
-			SetInputs(j);
-			RunTrainingCycle();
-		}
+    int i, j;
 
-		//possibly check if training is ready for early break
+	for (i = 0; i < parm.numberTrainingEpochs; i++)
+	{
+	    //randomize training sets
+        randomizeTrainingSets();
+        //loop through training sets
+        for(j=0; j<sets_training_data; j++)
+        {
+            //set inputs
+            inputs = training_data[j] + 1;
+            //set desired outputs
+            //need to convert from normalized value
+            //to 3-bit fire severity level
+
+            //UpdateNet(void);
+            //RunTrainingCycle(void);
+
+        }
 	}
 }
 
@@ -585,10 +624,6 @@ void C_Net::fowardRunData()
 		//burned
 	}
 
-}
-
-void C_Net::randomizeTrainingData()
-{
 }
 
 /**************************************************************************//**
@@ -617,7 +652,7 @@ unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
 	readInData();
-	//fullTrainingRun();
+	fullTrainingRun();
 	SaveWeightsToFile();
 	return 1;
 }
