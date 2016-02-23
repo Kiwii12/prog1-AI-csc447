@@ -807,7 +807,6 @@ unsigned int C_Net::TestNet(void)
 unsigned int C_Net::CrossValidateNet(void)
 {
 	int i, j, m;
-	double ** temp_training_data;
 
 	double temp;	
 	
