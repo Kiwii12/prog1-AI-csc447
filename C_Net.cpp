@@ -660,7 +660,7 @@ void C_Net::testRun()
         {
             //set inputs
             inputs = training_data[j] + 1;
-            cout << inputs[0] << " is the first input" << endl;
+            cout << inputs[0] << " is the first input " << training_data[j][1] << endl;
             //set desired outputs
 			if(training_data[j][0] < parm.lowCutoffNorm)
 			{
