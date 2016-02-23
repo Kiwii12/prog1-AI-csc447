@@ -641,6 +641,45 @@ void C_Net::fullTrainingRun()
 
 }
 
+void C_Net::testRun()
+{
+    int i, j;
+	int a1, a2, a3;
+        //loop through training sets
+        for(j=0; j<sets_training_data; j++)
+        {
+            //set inputs
+            inputs = training_data[j] + 1;
+            //set desired outputs
+			if(training_data[j][0] < parm.lowCutoffNorm)
+			{
+				a1 = 1;
+				a2 = 0;
+				a3 = 0;
+			}
+			else if(training_data[j][0] < parm.mediumCutoffNorm)
+			{
+				a1 = 0;
+				a2 = 1;
+				a3 = 0;
+			}
+			else
+			{
+				a1 = 0;
+				a2 = 0;
+				a3 = 1;
+			}
+			desired_outputs[0] = a1;
+			desired_outputs[1] = a2;
+			desired_outputs[2] = a3;
+
+            cout << "Desired Output: " << desired_outputs[0] <<
+                ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+                ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+                << outputs[2] << endl;
+        }
+}
+
 
 
 /**************************************************************************//**
@@ -709,6 +748,8 @@ unsigned int C_Net::TestNet(void)
 		cout << "Data must be trained before testing, please run ANNtrain <parameterfile>" << endl;
 		return 2;
 	}
+
+    testRun();
 
 	return 1;
 }

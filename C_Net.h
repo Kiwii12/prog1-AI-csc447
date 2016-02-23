@@ -93,6 +93,9 @@ public:
 
 	//completes the training cycle
 	void fullTrainingRun(void);
+    
+    //completes the test cycle
+    void testRun();
 
 	//Does a test run of the net
 	void fowardRunData();
