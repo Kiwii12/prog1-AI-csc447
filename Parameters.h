@@ -33,6 +33,9 @@ struct Parameters
 	int lowCutoff;
 	int mediumCutoff;
 	//High is anything above the medium cutoff
+	
+	double lowCutoffNorm;
+	double mediumCutoffNorm;
 };
 
 #endif

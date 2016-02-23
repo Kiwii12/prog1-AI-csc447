@@ -351,6 +351,8 @@ bool C_Net::readInData()
 			//cout << acres[i][k] << endl;
 		}
 	}
+	parm.lowCutoffNorm = normalize(min, max, parm.lowCutoff);
+	parm.mediumCutoffNorm = normalize(min, max, parm.mediumCutoff);
 
 
 	//put data in class variables
@@ -451,7 +453,7 @@ unsigned int C_Net::SetDesiredOutputs(double* desired_outputs_array, unsigned in
 
 //uses the input values to calculate new output values
 //runs forward through the net
-unsigned int C_Net::UpdateNet(void)
+void C_Net::UpdateNet(void)
 {
 	int i, j, k;
 	int nodes;
@@ -492,17 +494,22 @@ unsigned int C_Net::UpdateNet(void)
 			//now use sigmoid function
 			layers[i].node_activation[j] = (1.0/(1.0 + pow(2.7182818284, (-1.0*layers[i].node_value[j]))));
 
+			//set output values
+			if(i == (parm.layers - 1))
+            {
+                outputs[j] = layers[i].node_activation[j];
+            }
+
 		}
 	}
 
-  return 0;
 }
 
 
 
 //runs a single iteration of the generalized delta learning rule
 //training parameters need to be added still (private variables to class)
-unsigned int C_Net::RunTrainingCycle(void)
+void C_Net::RunTrainingCycle(void)
 {
 	int i, j, k, l;
 	int nodes;
@@ -512,16 +519,16 @@ unsigned int C_Net::RunTrainingCycle(void)
 	double activation;
 	double deltaWSum;
 	//loop through layers
-	for( i=parm.layers; i>0; i--)
+	for( i=(parm.layers - 1); i>=0; i--)
 	{
 		//number of nodes in current layer
-		nodes = parm.netLayerNodes[i];
+		nodes = parm.netLayerNodes[i+1];
 		//number of nodes in previous layer
-		nodes_prev = parm.netLayerNodes[i - 1];
+		nodes_prev = parm.netLayerNodes[i];
 		//number of nodes in next layer (unless output layer)
 		if(i < (parm.layers))
 		{
-		    nodes_next = parm.netLayerNodes[i + 1];
+		    nodes_next = parm.netLayerNodes[i + 2];
 	    }
 
 		//loop through nodes
@@ -533,7 +540,7 @@ unsigned int C_Net::RunTrainingCycle(void)
 			{
 		        activation = layers[i].node_activation[j];
 				//check if output layer
-				if(i == parm.layers)
+				if(i == (parm.layers - 1))
 				{
 					delta = activation*(1 - activation)*(desired_outputs[j] - activation);
 				}
@@ -541,7 +548,7 @@ unsigned int C_Net::RunTrainingCycle(void)
 				{
 					deltaWSum = 0;
 					//sum all the deltaW of next layer
-					for( l=0; i<nodes_next; l++)
+					for( l=0; l<nodes_next; l++)
 					{
 						deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
 					}
@@ -559,7 +566,7 @@ unsigned int C_Net::RunTrainingCycle(void)
 				else
 				{
 					//input layer special case
-					if(i == 1)
+					if(i == 0)
 					{
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*inputs[k];
 					}
@@ -576,13 +583,13 @@ unsigned int C_Net::RunTrainingCycle(void)
 	}
 
 
-    return 0;
 }
 
 
 void C_Net::fullTrainingRun()
 {
     int i, j;
+	int a1, a2, a3;
 
 	for (i = 0; i < parm.numberTrainingEpochs; i++)
 	{
@@ -594,14 +601,37 @@ void C_Net::fullTrainingRun()
             //set inputs
             inputs = training_data[j] + 1;
             //set desired outputs
-            //need to convert from normalized value
-            //to 3-bit fire severity level
+			if(training_data[j][0] < parm.lowCutoffNorm)
+			{
+				a1 = 1;
+				a2 = 0;
+				a3 = 0;
+			}
+			else if(training_data[j][0] < parm.mediumCutoffNorm)
+			{
+				a1 = 0;
+				a2 = 1;
+				a3 = 0;
+			}
+			else
+			{
+				a1 = 0;
+				a2 = 0;
+				a3 = 1;
+			}
+			desired_outputs[0] = a1;
+			desired_outputs[1] = a2;
+			desired_outputs[2] = a3;
 
-            //UpdateNet(void);
-            //RunTrainingCycle(void);
+            UpdateNet();
+
+            RunTrainingCycle();
 
         }
+
+
 	}
+
 }
 
 

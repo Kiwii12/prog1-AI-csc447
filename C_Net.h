@@ -88,17 +88,17 @@ public:
     unsigned int GetOutputs(double* outputs_array, unsigned int length);
     unsigned int SetDesiredOutputs(double* desired_outputs_array, unsigned int length);
 
-    unsigned int UpdateNet(void);
-    unsigned int RunTrainingCycle(void);
+    void UpdateNet(void);
+    void RunTrainingCycle(void);
 
 	//completes the training cycle
-	void fullTrainingRun();
+	void fullTrainingRun(void);
 
 	//Does a test run of the net
 	void fowardRunData();
 
 	//Randomize training data for epic
-	void randomizeTrainingData();
+	void randomizeTrainingData(void);
 
 	//revers process though net for training
 	void backwardsTrain();
@@ -116,7 +116,7 @@ public:
     void printEpoch(int eNum, double squareError);
 
     //print results to the screen
-    void printResults(); 
+    void printResults();
 
 private:
     unsigned int num_of_inputs;

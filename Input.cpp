@@ -28,10 +28,10 @@ Input::~Input()
 }
 
 /*******************************************************
-Function: parseParams	
+Function: parseParams
 Author: Allison Bodvig
 
-Description: Reads in the parameter file and puts each 
+Description: Reads in the parameter file and puts each
 value in a separate row in the prms array
 
 Return:
@@ -50,7 +50,7 @@ bool Input::parseParams()
 	ifstream param;
 
 	if (!openFile( param ))
-	{ 
+	{
 		return false;
 	};
 
@@ -113,11 +113,11 @@ void Input::setData(char prms[20][50])
 	parm.momentum = stod(prms[3]);
 	parm.threshold = stod(prms[4]);
 	parm.layers = stoi(prms[5]);
-	int layers = parm.layers;
+	//int layers = parm.layers;
 
 	//todo convert prms[6] to int array[layers]
 	parm.netLayerNodes = nullptr;
-	parm.netLayerNodes = new (nothrow) int[parm.layers + 1]; 
+	parm.netLayerNodes = new (nothrow) int[parm.layers + 1];
 
 	string temp = prms[6];
 	istringstream myStringStream(temp);
@@ -155,6 +155,6 @@ bool Input::openFile( ifstream &fin )
 		cerr << "Could not open parameter file. Exiting Program" << endl;
 		return false;
 	}
-	
+
 	return true;
 }
