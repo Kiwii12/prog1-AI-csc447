@@ -660,6 +660,7 @@ void C_Net::testRun()
         {
             //set inputs
             inputs = training_data[j] + 1;
+            cout << inputs[0] << " is the first input" << endl;
             //set desired outputs
 			if(training_data[j][0] < parm.lowCutoffNorm)
 			{
@@ -680,6 +681,8 @@ void C_Net::testRun()
 				a3 = 1;
 			}
             
+            UpdateNet();
+            
             cout << "finished foward run" << endl;
             
 			desired_outputs[0] = a1;
@@ -688,7 +691,7 @@ void C_Net::testRun()
 
             cout << "Desired Output: " << desired_outputs[0] <<
                 ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-                ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+                ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
                 << outputs[2] << endl;
         }
 }
@@ -748,7 +751,8 @@ unsigned int C_Net::TrainNet(void)
 
 unsigned int C_Net::TestNet(void)
 {
-
+    Initialize();
+    readInData();
     testRun();
 
 	return 1;
