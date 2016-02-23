@@ -368,7 +368,7 @@ bool C_Net::readInData()
 
     sets_training_data = num_data_sets;
     //m = number of inputs
-    m = parm.netLayerNodes[0] + 1;
+    m = parm.netLayerNodes[0] + 2;
     training_data = new double*[sets_training_data];
     for( i=0; i<sets_training_data; i++)
     {
@@ -395,8 +395,9 @@ bool C_Net::readInData()
         }
         for(j=0; j < parm.burnedAcreage; j++)
         {
-            training_data[i - start_year][j + 1 + parm.PDSIdata] = acres[i - 1 - j][1];
+            training_data[i - start_year][j + parm.PDSIdata] = acres[i - 1 - j][1];
         }
+        training_data[i - start_year][parm.netLayerNodes[0] + 1] = acres[i][0];
 
     }
 
@@ -642,9 +643,9 @@ void C_Net::fullTrainingRun()
         }
 
         s_error = s_error/(double)sets_training_data;
-        
-        if ((( i % 10 ) == 0) && (i > 0))
-        	printEpoch(i, s_error);
+
+        if (( (i+1) % 10 ) == 0)
+        	printEpoch(i+1, s_error);
 
 	}
 
@@ -713,7 +714,7 @@ unsigned int C_Net::CrossValidateNet(void)
 {
 	int i, j, m;
 	double ** temp_training_data;
-	
+
 	Initialize();
 	readInData();
 
