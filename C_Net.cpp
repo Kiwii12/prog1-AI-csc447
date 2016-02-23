@@ -593,6 +593,13 @@ void C_Net::fullTrainingRun()
 
 	for (i = 0; i < parm.numberTrainingEpochs; i++)
 	{
+	  //prints the epoch number and the error every 10 epochs
+	  if (((i % 10) == 0) && (i > 0))
+	  {
+	  	//change to send squared error instead of 0
+	  	printEpoch(i, 0.0);
+	  }
+
 	    //randomize training sets
         randomizeTrainingSets();
         //loop through training sets
@@ -696,9 +703,10 @@ unsigned int C_Net::TestNet(void)
 
 	fin.open(parm.weightsFile);
 
+	//check for weights file before testing the data
 	if (!fin)
 	{
-		cout << "Data must be trained before testing, please run ANNTrain <parameterfile>" << endl;
+		cout << "Data must be trained before testing, please run ANNtrain <parameterfile>" << endl;
 		return 2;
 	}
 
@@ -730,7 +738,7 @@ unsigned int C_Net::CrossValidateNet(void)
 	// print results
 }
 
-void printEpoch(int eNum, double squareError)
+void C_Net::printEpoch(int eNum, double squareError)
 {
 	//need to calcualte RMS
 	double rms;
@@ -742,7 +750,7 @@ void printEpoch(int eNum, double squareError)
 }
 
 
-void printResults()
+void C_Net::printResults()
 {
 
 	cout << "Year, Actual, Predicted" << endl;
