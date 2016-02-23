@@ -587,7 +587,7 @@ void C_Net::RunTrainingCycle(void)
 }
 
 
-void C_Net::fullTrainingRun()
+void C_Net::fullTrainingRun(bool print)
 {
   int i, j;
 	int a1, a2, a3;
@@ -643,15 +643,106 @@ void C_Net::fullTrainingRun()
         }
 
         s_error = s_error/(double)sets_training_data;
-
-        if (( (i+1) % 10 ) == 0)
-        	printEpoch(i+1, s_error);
-
+        
+        //checks if we want epoch number printed
+        if (print)
+        {
+        	if (( (i+1) % 10 ) == 0)
+        	
+        		printEpoch(i+1, s_error);
+        }
 	}
 
 }
 
+void C_Net::testRun()
+{
+    int i, j;
+	int a1, a2, a3;
+        //loop through training sets
+    cout << "starting test run" << endl;
+        for(j=0; j<sets_training_data; j++)
+        {
+            //set inputs
+            inputs = training_data[j] + 1;
+            cout << inputs[0] << " is the first input " << training_data[j][1] << endl;
+            //set desired outputs
+			if(training_data[j][0] < parm.lowCutoffNorm)
+			{
+				a1 = 1;
+				a2 = 0;
+				a3 = 0;
+			}
+			else if(training_data[j][0] < parm.mediumCutoffNorm)
+			{
+				a1 = 0;
+				a2 = 1;
+				a3 = 0;
+			}
+			else
+			{
+				a1 = 0;
+				a2 = 0;
+				a3 = 1;
+			}
+            
+            UpdateNet();
+            
+            cout << "finished foward run" << endl;
+            
+			desired_outputs[0] = a1;
+			desired_outputs[1] = a2;
+			desired_outputs[2] = a3;
 
+            cout << "Desired Output: " << desired_outputs[0] <<
+                ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+                ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+                << outputs[2] << endl;
+        }
+}
+
+void C_Net::CVtestRun()
+{
+	int i, j;
+	int a1, a2, a3;
+  //loop through training sets
+  cout << "starting cross validation test run" << endl;
+  //set inputs
+  inputs = training_data[sets_training_data] + 1;
+  cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
+  //set desired outputs
+  if(training_data[j][0] < parm.lowCutoffNorm)
+	{
+  	a1 = 1;
+		a2 = 0;
+		a3 = 0;
+	}
+	else if(training_data[j][0] < parm.mediumCutoffNorm)
+	{
+		a1 = 0;
+		a2 = 1;
+		a3 = 0;
+	}
+	else
+	{
+		a1 = 0;
+		a2 = 0;
+		a3 = 1;
+	}
+          
+  UpdateNet();
+          
+  cout << "finished foward run" << endl;
+            
+  desired_outputs[0] = a1;
+	desired_outputs[1] = a2;
+	desired_outputs[2] = a3;
+
+  cout << "Desired Output: " << desired_outputs[0] <<
+    ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+    ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+     << outputs[2] << endl;
+}
 
 /**************************************************************************//**
  * @Description - This function has to run a test run of the Neural Net
@@ -699,13 +790,16 @@ unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
 	readInData();
-	fullTrainingRun();
+	fullTrainingRun(true);
 	SaveWeightsToFile();
 	return 1;
 }
 
 unsigned int C_Net::TestNet(void)
 {
+    Initialize();
+    readInData();
+    testRun();
 
 	return 1;
 }
@@ -715,56 +809,58 @@ unsigned int C_Net::CrossValidateNet(void)
 	int i, j, m;
 	double ** temp_training_data;
 
+	double temp;	
+	
 	Initialize();
 	readInData();
 
-	//normalized data is in PDSI and acres arrays
-	//take data and loop through removing one and training the rest
-	//then test the one point that was not used for training
-	/***************
-	for (int i = 0; i < numyears; i++)
-	{
-		//make new weights file for each training call??
-		train on data with skipping index i
-		test index i with results from training
-	}
-	print results
+	m = parm.PDSIdata + parm.burnedAcreage;
 
-	*****************/
-
+	double temp_training_data[sets_training_data][m];
 
   //put clean copy of training data in temp
   for (i = 0; i < sets_training_data; i++)
   {
-  	// temp_training_data[i][0] = training_data[i][0];
-  	// cout << temp_training_data[i][0] << " " << training_data[i][0] << endl;
-  	cout << i << endl;
+  	temp_training_data[i][0] = training_data[i][0];
+  	for (j = 0; j < m; j++)
+  	{
+  		temp_training_data[i][j] = training_data[i][j];
+  	}
   }
 
-	//normalized data is in PDSI and acres arrays
-	//take data and loop through removing one and training the rest
-	//then test the one point that was not used for training
-	// for (int i = 0; i < sets_training_data; i++)
-	// {
-	// 	//make new weights file for each training call
-	// 	if (i != 0)
-	// 	{
-	// 		//SetSmallRandomWeights();
-	// 	}
+	for (i = 0; i < sets_training_data; i++)
+	{
+		//make new weights file for each training call
+		if (i != 0)
+		{
+			SetSmallRandomWeights();
+		}
 
-	// 	for (j = 0; j < sets_training_data; j++)
-	// 	{
+		//swtiches point that will be tested with last point
+		for (j = 0; j < m; j++)
+		{
+			temp = training_data[i][j];
+			training_data[i][j] = training_data[sets_training_data-1][j];
+			training_data[sets_training_data-1][j] = temp;
+		}
+		//decrease 1 since one point was 'removed'
+		sets_training_data--;
+		// train on remeaining data
+		
+		fullTrainingRun(false);
 
-	// 	}
+		// test on training_data[i][all]
+		CVtestRun();
+		// reset training_data and sets_training_data
+		for (j = 0; j < m; j++)
+		{
+			training_data[i][j] = temp_training_data[i][j];
+			training_data[sets_training_data][j] = temp_training_data[sets_training_data][j];
+		}
+		sets_training_data++;
+	}
 
-	// 	//remove index 0 and save new training set
-	// 	// skip training_data[i][all]
-	// 	// train on remeaining data
-	// 	// test on training_data[i][all]
-	// 	// clear testing_set and add data back to training_data
-	// }
-	// // delete[] tempA;
-	// // print results
+	//print test results
 }
 
 void C_Net::printEpoch(int eNum, double squareError)
