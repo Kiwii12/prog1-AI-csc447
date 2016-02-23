@@ -19,7 +19,7 @@
 #---------------
 
 weights.wts     # name of ANN weight file
-1000            # number of training epochs
+10            # number of training epochs
 0.4             # learning rate
 0.8             # momentum
 0.01            # threshold for ANN error (training cutoff OR testing acceptance)
@@ -30,7 +30,7 @@ weights.wts     # name of ANN weight file
 # training and testing data file
 #-------------------------------
 
-PDSI_NW_1998-2015.csv
+PDSI_NW_1998_2015.csv
 
 #------------------------------------------
 # input feature vector info:

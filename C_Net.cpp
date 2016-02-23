@@ -290,6 +290,7 @@ bool C_Net::readInData()
 	if (dataFile.fail())
 	{
 		cout << "Unable to open " << parm.dataFile << endl;;
+		exit(1);
 	}
 
 	//ignores the first two lines
@@ -473,7 +474,7 @@ void C_Net::UpdateNet(void)
 			//loop through weights
 			for( k=0; k<nodes_prev; k++)
 			{
-				//sum inputs (from prev layer nodes)
+				//sum inputs (original input values)
 				if(i == 0)
 				{
 					//input layer is special case
@@ -482,6 +483,7 @@ void C_Net::UpdateNet(void)
 					//+1 to account for bias weight
 					layers[i].node_value[j] += inputs[k]*layers[i].weights[j*(nodes_prev+1) + k];
 				}
+				//sum inputs (from prev layer nodes)
 				else if( layers[i-1].node_activation[j] >= 0.5)
 				{
 					layers[i].node_value[j] += layers[i].weights[j*(nodes_prev+1) + k];
@@ -498,6 +500,11 @@ void C_Net::UpdateNet(void)
 			if(i == (parm.layers - 1))
             {
                 outputs[j] = layers[i].node_activation[j];
+				cout << outputs[j] << ", ";
+				if (j % 3 == 2)
+				{
+					cout << " = Output of a training run!@!!@!@@!!" << endl;
+				}
             }
 
 		}
@@ -739,7 +746,7 @@ void C_Net::CVtestRun()
 
   cout << "Desired Output: " << desired_outputs[0] <<
     ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-    ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+    ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
      << outputs[2] << endl;
 }
 
@@ -805,7 +812,7 @@ unsigned int C_Net::TestNet(void)
 
 unsigned int C_Net::CrossValidateNet(void)
 {
-	int i, j, m;
+	/*int i, j, m;
 	double temp;	
 	
 	Initialize();
@@ -813,7 +820,7 @@ unsigned int C_Net::CrossValidateNet(void)
 
 	m = parm.PDSIdata + parm.burnedAcreage;
 
-	double temp_training_data[sets_training_data][m];
+	//double temp_training_data[sets_training_data][m];
 
   //put clean copy of training data in temp
   for (i = 0; i < sets_training_data; i++)
@@ -857,7 +864,8 @@ unsigned int C_Net::CrossValidateNet(void)
 		sets_training_data++;
 	}
 
-	//print test results
+	//print test results */
+	return 0;
 }
 
 void C_Net::printEpoch(int eNum, double squareError)
