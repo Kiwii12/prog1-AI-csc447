@@ -588,7 +588,7 @@ void C_Net::RunTrainingCycle(void)
 
 void C_Net::fullTrainingRun()
 {
-    int i, j;
+  int i, j;
 	int a1, a2, a3;
 
 	double s_error, output_diff1, output_diff2, output_diff3;
@@ -642,7 +642,9 @@ void C_Net::fullTrainingRun()
         }
 
         s_error = s_error/(double)sets_training_data;
-        printEpoch(i+1, s_error);
+        
+        if ((( i % 10 ) == 0) && (i > 0))
+        	printEpoch(i, s_error);
 
 	}
 
@@ -754,8 +756,12 @@ unsigned int C_Net::TestNet(void)
 
 unsigned int C_Net::CrossValidateNet(void)
 {
+	int i, j, m;
+	double ** temp_training_data;
+	
 	Initialize();
 	readInData();
+
 	//normalized data is in PDSI and acres arrays
 	//take data and loop through removing one and training the rest
 	//then test the one point that was not used for training
@@ -769,6 +775,40 @@ unsigned int C_Net::CrossValidateNet(void)
 	print results
 
 	*****************/
+
+
+  //put clean copy of training data in temp
+  for (i = 0; i < sets_training_data; i++)
+  {
+  	// temp_training_data[i][0] = training_data[i][0];
+  	// cout << temp_training_data[i][0] << " " << training_data[i][0] << endl;
+  	cout << i << endl;
+  }
+
+	//normalized data is in PDSI and acres arrays
+	//take data and loop through removing one and training the rest
+	//then test the one point that was not used for training
+	// for (int i = 0; i < sets_training_data; i++)
+	// {
+	// 	//make new weights file for each training call
+	// 	if (i != 0)
+	// 	{
+	// 		//SetSmallRandomWeights();
+	// 	}
+
+	// 	for (j = 0; j < sets_training_data; j++)
+	// 	{
+
+	// 	}
+
+	// 	//remove index 0 and save new training set
+	// 	// skip training_data[i][all]
+	// 	// train on remeaining data
+	// 	// test on training_data[i][all]
+	// 	// clear testing_set and add data back to training_data
+	// }
+	// // delete[] tempA;
+	// // print results
 }
 
 void C_Net::printEpoch(int eNum, double squareError)
