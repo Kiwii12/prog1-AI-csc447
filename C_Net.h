@@ -103,15 +103,13 @@ public:
 	//Does a test run of the net
 	void fowardRunData();
 
-	//Randomize training data for epic
-	void randomizeTrainingData(void);
-
 	//revers process though net for training
 	void backwardsTrain();
 
 	//Needs to get the param file data <- pulled from ANN.h
 	void setData(Parameters newData);
 
+	//Randomize training data for epic
 	void randomizeTrainingSets(void);
 
 	unsigned int TrainNet(void);

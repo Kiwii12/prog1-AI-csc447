@@ -397,8 +397,10 @@ bool C_Net::readInData()
         for(j=0; j < parm.burnedAcreage; j++)
         {
             training_data[i - start_year][j + parm.PDSIdata] = acres[i - 1 - j][1];
+			cout << "acres[i - 1 - j][1] = " << acres[i-1-j][1] << endl;
         }
         training_data[i - start_year][parm.netLayerNodes[0] + 1] = acres[i][0];
+		cout << "acres[i][0] = " << acres[i][0] << endl;
 
     }
 
@@ -501,11 +503,6 @@ void C_Net::UpdateNet(void)
 			if(i == (parm.layers - 1))
             {
                 outputs[j] = layers[i].node_activation[j];
-				cout << outputs[j] << ", ";
-				if (j % 3 == 2)
-				{
-					cout << " = Output of a training run!@!!@!@@!!" << endl;
-				}
             }
 
 		}
@@ -667,12 +664,14 @@ void C_Net::testRun()
     int i, j;
 	int a1, a2, a3;
         //loop through training sets
-    cout << "starting test run" << endl;
         for(j=0; j<sets_training_data; j++)
         {
             //set inputs
             inputs = training_data[j] + 1;
-            cout << inputs[0] << " is the first input " << training_data[j][1] << endl;
+			//cout << "inputs: = " << training_data[j] + 1 << endl;
+			for (i = 0; i < parm.netLayerNodes[0]; i++)
+				cout << inputs[i];
+
             //set desired outputs
 			if(training_data[j][0] < parm.lowCutoffNorm)
 			{
@@ -694,8 +693,6 @@ void C_Net::testRun()
 			}
             
             UpdateNet();
-            
-            cout << "finished foward run" << endl;
             
 			desired_outputs[0] = a1;
 			desired_outputs[1] = a2;
@@ -813,12 +810,7 @@ unsigned int C_Net::TestNet(void)
 
 unsigned int C_Net::CrossValidateNet(void)
 {
-<<<<<<< HEAD
 	/*int i, j, m;
-=======
-	int i, j, m;
-
->>>>>>> 7a658cae5bcc1921d135ffaebe02be687037a628
 	double temp;	
 	
 	Initialize();
@@ -826,7 +818,7 @@ unsigned int C_Net::CrossValidateNet(void)
 
 	m = parm.PDSIdata + parm.burnedAcreage;
 
-	//double temp_training_data[sets_training_data][m];
+	double temp_training_data[sets_training_data][m];
 
   //put clean copy of training data in temp
   for (i = 0; i < sets_training_data; i++)
