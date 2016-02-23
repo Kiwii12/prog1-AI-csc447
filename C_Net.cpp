@@ -591,8 +591,12 @@ void C_Net::fullTrainingRun()
     int i, j;
 	int a1, a2, a3;
 
+	double s_error, output_diff1, output_diff2, output_diff3;
+
 	for (i = 0; i < parm.numberTrainingEpochs; i++)
 	{
+	    s_error = 0.0;
+
 	    //randomize training sets
         randomizeTrainingSets();
         //loop through training sets
@@ -625,10 +629,20 @@ void C_Net::fullTrainingRun()
 
             UpdateNet();
 
+            //add s_errror
+            output_diff1 = abs((desired_outputs[0] - outputs[0])/3.0);
+            output_diff2 = abs((desired_outputs[1] - outputs[1])/3.0);
+            output_diff3 = abs((desired_outputs[2] - outputs[2])/3.0);
+            output_diff1 = output_diff1 + output_diff2 + output_diff3;
+            s_error += output_diff1*output_diff1;
+
+
             RunTrainingCycle();
 
         }
 
+        s_error = s_error/(double)sets_training_data;
+        printEpoch(i+1, s_error);
 
 	}
 
@@ -712,19 +726,19 @@ unsigned int C_Net::CrossValidateNet(void)
 	*****************/
 }
 
-void printEpoch(int eNum, double squareError)
+void C_Net::printEpoch(int eNum, double squareError)
 {
 	//need to calcualte RMS
 	double rms;
 
-	rms = squareError / eNum;
-	rms = sqrt(rms);
+	//rms = squareError / eNum;
+	rms = sqrt(squareError);
 
 	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
 }
 
 
-void printResults()
+void C_Net::printResults()
 {
 
 	cout << "Year, Actual, Predicted" << endl;
