@@ -591,14 +591,11 @@ void C_Net::fullTrainingRun()
     int i, j;
 	int a1, a2, a3;
 
+	double s_error, output_diff1, output_diff2, output_diff3;
+
 	for (i = 0; i < parm.numberTrainingEpochs; i++)
 	{
-	  //prints the epoch number and the error every 10 epochs
-	  if (((i % 10) == 0) && (i > 0))
-	  {
-	  	//change to send squared error instead of 0
-	  	printEpoch(i, 0.0);
-	  }
+	    s_error = 0.0;
 
 	    //randomize training sets
         randomizeTrainingSets();
@@ -632,10 +629,20 @@ void C_Net::fullTrainingRun()
 
             UpdateNet();
 
+            //add s_errror
+            output_diff1 = abs((desired_outputs[0] - outputs[0])/3.0);
+            output_diff2 = abs((desired_outputs[1] - outputs[1])/3.0);
+            output_diff3 = abs((desired_outputs[2] - outputs[2])/3.0);
+            output_diff1 = output_diff1 + output_diff2 + output_diff3;
+            s_error += output_diff1*output_diff1;
+
+
             RunTrainingCycle();
 
         }
 
+        s_error = s_error/(double)sets_training_data;
+        printEpoch(i+1, s_error);
 
 	}
 
@@ -735,19 +742,6 @@ unsigned int C_Net::TrainNet(void)
 
 unsigned int C_Net::TestNet(void)
 {
-	ifstream fin;
-
-	Initialize();
-	readInData();
-
-	fin.open(parm.weightsFile);
-
-	//check for weights file before testing the data
-	if (!fin)
-	{
-		cout << "Data must be trained before testing, please run ANNtrain <parameterfile>" << endl;
-		return 2;
-	}
 
     testRun();
 
@@ -758,25 +752,19 @@ unsigned int C_Net::CrossValidateNet(void)
 {
 	Initialize();
 	readInData();
-
 	//normalized data is in PDSI and acres arrays
 	//take data and loop through removing one and training the rest
 	//then test the one point that was not used for training
-	for (int i = 0; i < sets_training_data; i++)
+	/***************
+	for (int i = 0; i < numyears; i++)
 	{
-		//make new weights file for each training call
-		if (i != 0)
-		{
-			SetSmallRandomWeights();
-		}
-
-		//remove index 0 and save new training set
-		// skip training_data[i][all]
-		// train on remeaining data
-		// test on training_data[i][all]
-		// clear testing_set and add data back to training_data
+		//make new weights file for each training call??
+		train on data with skipping index i
+		test index i with results from training
 	}
-	// print results
+	print results
+
+	*****************/
 }
 
 void C_Net::printEpoch(int eNum, double squareError)
@@ -784,8 +772,8 @@ void C_Net::printEpoch(int eNum, double squareError)
 	//need to calcualte RMS
 	double rms;
 
-	rms = squareError / eNum;
-	rms = sqrt(rms);
+	//rms = squareError / eNum;
+	rms = sqrt(squareError);
 
 	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
 }
