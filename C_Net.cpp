@@ -586,7 +586,7 @@ void C_Net::RunTrainingCycle(void)
 }
 
 
-void C_Net::fullTrainingRun()
+void C_Net::fullTrainingRun(bool print)
 {
   int i, j;
 	int a1, a2, a3;
@@ -643,9 +643,13 @@ void C_Net::fullTrainingRun()
 
         s_error = s_error/(double)sets_training_data;
         
-        if ((( i % 10 ) == 0) && (i > 0))
-        	printEpoch(i, s_error);
-
+        //checks if we want epoch number printed
+        if (print)
+        {
+        	if ((( i % 10 ) == 0) && (i > 0))
+        	
+        		printEpoch(i, s_error);
+        }
 	}
 
 }
@@ -744,7 +748,7 @@ unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
 	readInData();
-	fullTrainingRun();
+	fullTrainingRun(true);
 	SaveWeightsToFile();
 	return 1;
 }
@@ -761,58 +765,59 @@ unsigned int C_Net::TestNet(void)
 unsigned int C_Net::CrossValidateNet(void)
 {
 	int i, j, m;
-	double ** temp_training_data;
+	double temp;	
 	
 	Initialize();
 	readInData();
 
-	//normalized data is in PDSI and acres arrays
-	//take data and loop through removing one and training the rest
-	//then test the one point that was not used for training
-	/***************
-	for (int i = 0; i < numyears; i++)
-	{
-		//make new weights file for each training call??
-		train on data with skipping index i
-		test index i with results from training
-	}
-	print results
+	m = parm.PDSIdata + parm.burnedAcreage;
 
-	*****************/
-
+	double temp_training_data[sets_training_data][m];
 
   //put clean copy of training data in temp
   for (i = 0; i < sets_training_data; i++)
   {
-  	// temp_training_data[i][0] = training_data[i][0];
-  	// cout << temp_training_data[i][0] << " " << training_data[i][0] << endl;
-  	cout << i << endl;
+  	temp_training_data[i][0] = training_data[i][0];
+  	for (j = 0; j < m; j++)
+  	{
+  		temp_training_data[i][j] = training_data[i][j];
+  	}
   }
 
-	//normalized data is in PDSI and acres arrays
-	//take data and loop through removing one and training the rest
-	//then test the one point that was not used for training
-	// for (int i = 0; i < sets_training_data; i++)
-	// {
-	// 	//make new weights file for each training call
-	// 	if (i != 0)
-	// 	{
-	// 		//SetSmallRandomWeights();
-	// 	}
+	for (i = 0; i < sets_training_data; i++)
+	{
+		//make new weights file for each training call
+		if (i != 0)
+		{
+			SetSmallRandomWeights();
+		}
 
-	// 	for (j = 0; j < sets_training_data; j++)
-	// 	{
+		//swtiches point that will be tested with last point
+		for (j = 0; j < m; j++)
+		{
+			temp = training_data[i][j];
+			training_data[i][j] = training_data[sets_training_data-1][j];
+			training_data[sets_training_data-1][j] = temp;
+		}
+		//decrease 1 since one point was 'removed'
+		sets_training_data--;
+		// train on remeaining data
+		
 
-	// 	}
+		fullTrainingRun(false);
 
-	// 	//remove index 0 and save new training set
-	// 	// skip training_data[i][all]
-	// 	// train on remeaining data
-	// 	// test on training_data[i][all]
-	// 	// clear testing_set and add data back to training_data
-	// }
-	// // delete[] tempA;
-	// // print results
+		// test on training_data[i][all]
+		// cvTestRun()
+		// reset training_data and sets_training_data
+		for (j = 0; j < m; j++)
+		{
+			training_data[i][j] = temp_training_data[i][j];
+			training_data[sets_training_data][j] = temp_training_data[sets_training_data][j];
+		}
+		sets_training_data++;
+	}
+
+	//print test results
 }
 
 void C_Net::printEpoch(int eNum, double squareError)

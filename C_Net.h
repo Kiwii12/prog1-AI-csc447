@@ -92,7 +92,7 @@ public:
     void RunTrainingCycle(void);
 
 	//completes the training cycle
-	void fullTrainingRun(void);
+	void fullTrainingRun(bool print);
     
     //completes the test cycle
     void testRun();
