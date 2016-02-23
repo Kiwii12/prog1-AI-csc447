@@ -125,7 +125,7 @@ void Input::setData(char prms[20][50])
 	while (getline(myStringStream, temp, ' ') && i < parm.layers + 1)
 	{
 		parm.netLayerNodes[i] = (stoi(temp));
-		cout << "net layer nodes has " << parm.netLayerNodes[i] << endl;
+		//cout << "net layer nodes has " << parm.netLayerNodes[i] << endl;
 		i++;
 	}
 

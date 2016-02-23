@@ -689,6 +689,18 @@ unsigned int C_Net::TrainNet(void)
 
 unsigned int C_Net::TestNet(void)
 {
+	ifstream fin;
+
+	Initialize();
+	readInData();
+
+	fin.open(parm.weightsFile);
+
+	if (!fin)
+	{
+		cout << "Data must be trained before testing, please run ANNTrain <parameterfile>" << endl;
+		return 2;
+	}
 
 	return 1;
 }
@@ -697,19 +709,25 @@ unsigned int C_Net::CrossValidateNet(void)
 {
 	Initialize();
 	readInData();
+
 	//normalized data is in PDSI and acres arrays
 	//take data and loop through removing one and training the rest
 	//then test the one point that was not used for training
-	/***************
-	for (int i = 0; i < numyears; i++)
+	for (int i = 0; i < sets_training_data; i++)
 	{
-		//make new weights file for each training call??
-		train on data with skipping index i
-		test index i with results from training
-	}
-	print results
+		//make new weights file for each training call
+		if (i != 0)
+		{
+			SetSmallRandomWeights();
+		}
 
-	*****************/
+		//remove index 0 and save new training set
+		// skip training_data[i][all]
+		// train on remeaining data
+		// test on training_data[i][all]
+		// clear testing_set and add data back to training_data
+	}
+	// print results
 }
 
 void printEpoch(int eNum, double squareError)
