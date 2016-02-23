@@ -156,7 +156,8 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 		nodes_prev = parm.netLayerNodes[i];
 		count = nodes*nodes_prev + nodes;
 
-		srand(time(NULL));
+		//srand(time(NULL));
+		srand(5);
 	 	for (j = 0; j < count; ++j)
 		{
 			//creates random weights bewtween [-1,1]
@@ -355,6 +356,7 @@ bool C_Net::readInData()
 	parm.mediumCutoffNorm = normalize(min, max, parm.mediumCutoff);
 
 
+
 	//put data in class variables
     years_acreage = j - 1;
 
@@ -395,11 +397,21 @@ bool C_Net::readInData()
         }
         for(j=0; j < parm.burnedAcreage; j++)
         {
-            training_data[i - start_year][j + parm.PDSIdata] = acres[i - 1 - j][1];
+            training_data[i - start_year][j + parm.PDSIdata + 1] = acres[i - 1 - j][1];
         }
         training_data[i - start_year][parm.netLayerNodes[0] + 1] = acres[i][0];
 
     }
+
+/*
+    for( i=0; i<sets_training_data; i++ )
+    {
+        for( j=0; j<parm.netLayerNodes[0] + 2; j++)
+        {
+            cout << training_data[i][j] << "\n";
+        }
+        cout << "\n\n";
+    }*/
 
 
 	return false;
@@ -411,7 +423,7 @@ void C_Net::randomizeTrainingSets(void)
     //randomly shuffle the training data using Knuth shuffle
     int i, j, m;
     double* tempA;
-    m = parm.netLayerNodes[0] + 1;
+    m = parm.netLayerNodes[0] + 2;
     srand(time(NULL));
     tempA = new double[m];
     for(i=0; i<sets_training_data - 1; i++)
@@ -483,9 +495,9 @@ void C_Net::UpdateNet(void)
 					//+1 to account for bias weight
 					layers[i].node_value[j] += inputs[k]*layers[i].weights[j*(nodes_prev+1) + k];
 				}
-				else if( layers[i-1].node_activation[j] >= 0.5)
+				else
 				{
-					layers[i].node_value[j] += layers[i].weights[j*(nodes_prev+1) + k];
+					layers[i].node_value[j] += layers[i-1].node_activation[j]*layers[i].weights[j*(nodes_prev+1) + k];
 				}
 
 			}
@@ -605,6 +617,7 @@ void C_Net::fullTrainingRun(bool print)
         {
             //set inputs
             inputs = training_data[j] + 1;
+
             //set desired outputs
 			if(training_data[j][0] < parm.lowCutoffNorm)
 			{
@@ -643,12 +656,12 @@ void C_Net::fullTrainingRun(bool print)
         }
 
         s_error = s_error/(double)sets_training_data;
-        
+
         //checks if we want epoch number printed
         if (print)
         {
         	if (( (i+1) % 10 ) == 0)
-        	
+
         		printEpoch(i+1, s_error);
         }
 	}
@@ -685,11 +698,11 @@ void C_Net::testRun()
 				a2 = 0;
 				a3 = 1;
 			}
-            
+
             UpdateNet();
-            
+
             cout << "finished foward run" << endl;
-            
+
 			desired_outputs[0] = a1;
 			desired_outputs[1] = a2;
 			desired_outputs[2] = a3;
@@ -729,11 +742,11 @@ void C_Net::CVtestRun()
 		a2 = 0;
 		a3 = 1;
 	}
-          
+
   UpdateNet();
-          
+
   cout << "finished foward run" << endl;
-            
+
   desired_outputs[0] = a1;
 	desired_outputs[1] = a2;
 	desired_outputs[2] = a3;
@@ -808,8 +821,8 @@ unsigned int C_Net::CrossValidateNet(void)
 {
 	int i, j, m;
 
-	double temp;	
-	
+	double temp;
+
 	Initialize();
 	readInData();
 
@@ -845,7 +858,7 @@ unsigned int C_Net::CrossValidateNet(void)
 		//decrease 1 since one point was 'removed'
 		sets_training_data--;
 		// train on remeaining data
-		
+
 		fullTrainingRun(false);
 
 		// test on training_data[i][all]
