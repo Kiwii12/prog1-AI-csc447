@@ -653,6 +653,7 @@ void C_Net::testRun()
     int i, j;
 	int a1, a2, a3;
         //loop through training sets
+    cout << "starting test run" << endl;
         for(j=0; j<sets_training_data; j++)
         {
             //set inputs
@@ -676,6 +677,9 @@ void C_Net::testRun()
 				a2 = 0;
 				a3 = 1;
 			}
+            
+            cout << "finished foward run" << endl;
+            
 			desired_outputs[0] = a1;
 			desired_outputs[1] = a2;
 			desired_outputs[2] = a3;
