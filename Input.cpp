@@ -14,11 +14,6 @@ Input::Input( string paramFileName )
 	parm.paramFile = paramFileName;
 }
 
-Input::Input()
-{
-	parm.paramFile = "Parameter.prm";
-}
-
 Input::~Input()
 {
 	if (parm.netLayerNodes != nullptr)

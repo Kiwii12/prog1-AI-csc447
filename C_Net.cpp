@@ -2,21 +2,40 @@
 #include <cstring>
 #include <algorithm>
 
-//set values to zero
-//set pointers to null
+/*******************************************************
+Function: C_Net::C_Net()
+Author: 
+
+Description: 
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 C_Net::C_Net()
 {
 
 }
 
-//deallocate memory used by non-null pointers
+/*******************************************************
+Function: C_Net::~C_Net()
+Author: 
+
+Description: deallocates all the dynamically allocated
+memory
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 C_Net::~C_Net()
 {
-	// if (parm.netLayerNodes != nullptr)
-	// {
-	// 	delete[] parm.netLayerNodes;
-	// }
-
 	//free dynamically allocated memory
 	int i;
 	for (i = 0; i<parm.layers; i++)
@@ -37,7 +56,19 @@ C_Net::~C_Net()
 
 }
 
-//set values and allocate all needed memory
+/*******************************************************
+Function: C_Net::Initialize()
+Author: 
+
+Description: Initializes the data.
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 unsigned int C_Net::Initialize()
 {
 	//Make sure setData is called before this function!!!
@@ -77,10 +108,20 @@ unsigned int C_Net::Initialize()
 }
 
 
-//load weights into memory
-//return an error if file does not exist
-//return different error if number of weights in file
-//    do not match expected number of weights
+/*******************************************************
+Function: C_Net::LoadWeightsFromFile()
+Author: 
+
+Description: This function loads the weights from the 
+weights file. 
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 unsigned int C_Net::LoadWeightsFromFile()
 {
 	int count = 0;
@@ -104,13 +145,29 @@ unsigned int C_Net::LoadWeightsFromFile()
     return 1;
 }
 
-//save weights to file
+/*******************************************************
+Function: C_Net::SaveWeightsToFile()
+Author: 
+
+Description: This function writes the new weights to the 
+weights file
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 unsigned int C_Net::SaveWeightsToFile()
 {
 	int count = 0;
 	int nodes, nodes_prev;
 	ofstream fout;
+
+	//open the weights file
 	fout.open(parm.weightsFile, std::ios_base::trunc);
+
 	for (int i = 0; i<(parm.layers); i++)
 	{
 
@@ -120,25 +177,27 @@ unsigned int C_Net::SaveWeightsToFile()
 
 		for (int j = 0; j < count; ++j)
 		{
-			//creates random weights bewtween [-1,1]
+			//print weigths to file 
 			fout << layers[i].weights[j] << endl;
 		}
 	}
 	fout.close();
-	//make sure to save Weights Array
 
     return 1;
 }
 
 /*******************************************************
-Function: SetSmallRandomWeights
+Function: C_Net::SetSmallRandomWeights()
 Author: Allison Bodvig
 
 Description: This function calculates random weights
 between -1 and 1.
 
+Parameters:
+	None
+
 Return:
-	returns 1
+	None
 
 ********************************************************/
 unsigned int C_Net::SetSmallRandomWeights(void)
@@ -168,7 +227,7 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 }
 
 /*******************************************************
-Function: findMin
+Function: C_Net::findMin()
 Author: Allison Bodvig
 
 Description: This function finds the minimum value found
@@ -203,7 +262,7 @@ float C_Net::findMin(float values[][13], int years, int vals)
 
 
 /*******************************************************
-Function: findMax
+Function: C_Net::findMax()
 Author: Allison Bodvig
 
 Description: This function finds the maximum value found
@@ -236,7 +295,7 @@ float C_Net::findMax(float values[][13], int years, int vals)
 }
 
 /*******************************************************
-Function: normalize
+Function: C_Net::normalize()
 Author: Allison Bodvig
 
 Description: This function finds the minimum values found
@@ -259,11 +318,15 @@ float C_Net::normalize(float min, float max, float val)
 
 
 /*******************************************************
-Function: finMin
-Author: Allison Bodvig
+Function: C_Net::readInData()
+Author: Allison Bodvig and Jacob St. Amand
 
-Description: This function finds the minimum values found
-in the list of values
+Description: This function reads in the data from the 
+csv file and normalizes all the data. Also moves the data
+to the training_data array
+
+Parameters:
+	None
 
 Return:
 	returns true or false if data was read in
@@ -349,8 +412,6 @@ bool C_Net::readInData()
 	parm.lowCutoffNorm = normalize(min, max, parm.lowCutoff);
 	parm.mediumCutoffNorm = normalize(min, max, parm.mediumCutoff);
 
-
-
 	//put data in class variables
     years_acreage = j - 1;
 
@@ -393,6 +454,7 @@ bool C_Net::readInData()
         {
             training_data[i - start_year][j + parm.PDSIdata + 1] = acres[i - 1 - j][1];
         }
+        //adds year to trainging data2
         training_data[i - start_year][parm.netLayerNodes[0] + 1] = acres[i][0];
 
     }
@@ -400,7 +462,19 @@ bool C_Net::readInData()
 	return false;
 }
 
+/*******************************************************
+Function: C_Net::randomizeTrainingSets()
+Author: 
 
+Description: This function randomizes the trainging data
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 void C_Net::randomizeTrainingSets(void)
 {
     //randomly shuffle the training data using Knuth shuffle
@@ -424,31 +498,20 @@ void C_Net::randomizeTrainingSets(void)
     delete[] tempA;
 }
 
+/*******************************************************
+Function: C_Net::UpdateNet()
+Author: 
 
-//sets the inputs to the net
-//still need to run UpdateNet command to calculate new output values
-unsigned int C_Net::SetInputs(int Count)
-{
-	//inputArray = arrayOfInputs[count];
-    return 1;
-}
+Description: 
 
-//just returns the output values
-unsigned int C_Net::GetOutputs(double* outputs_array, unsigned int length)
-{
+Parameters:
+	None
 
-    return 1;
-}
+Return:
+	None
 
-//set desired output values (used for training the net)
-unsigned int C_Net::SetDesiredOutputs(double* desired_outputs_array, unsigned int length)
-{
+********************************************************/
 
-    return 1;
-}
-
-//uses the input values to calculate new output values
-//runs forward through the net
 void C_Net::UpdateNet(void)
 {
 	int i, j, k;
@@ -493,26 +556,35 @@ void C_Net::UpdateNet(void)
 
 			//set output values
 			if(i == (parm.layers - 1))
-            {
-                outputs[j] = layers[i].node_activation[j];
-            }
+      {
+        outputs[j] = layers[i].node_activation[j];
+      }
 
 		}
 	}
 
 }
 
+/*******************************************************
+Function: C_Net::RunTrainingCycle()
+Author: 
 
+Description: 
 
-//runs a single iteration of the generalized delta learning rule
-//training parameters need to be added still (private variables to class)
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 void C_Net::RunTrainingCycle(void)
 {
 	int i, j, k, l;
 	int nodes;
 	int nodes_prev;
 	int nodes_next;
-    double delta;
+  double delta;
 	double activation;
 	double deltaWSum;
 	//loop through layers
@@ -572,17 +644,24 @@ void C_Net::RunTrainingCycle(void)
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
 					}
 				}
-
 			}
-
 		}
-
 	}
-
-
 }
 
+/*******************************************************
+Function: C_Net::fullTrainingRun()
+Author: 
 
+Description: 
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 void C_Net::fullTrainingRun(bool print)
 {
   int i, j;
@@ -592,17 +671,17 @@ void C_Net::fullTrainingRun(bool print)
 
 	for (i = 0; i < parm.numberTrainingEpochs; i++)
 	{
-	    s_error = 0.0;
+	  s_error = 0.0;
 
-	    //randomize training sets
-        randomizeTrainingSets();
-        //loop through training sets
-        for(j=0; j<sets_training_data; j++)
-        {
-            //set inputs
-            inputs = training_data[j] + 1;
+    //randomize training sets
+    randomizeTrainingSets();
+    //loop through training sets
+    for(j=0; j<sets_training_data; j++)
+    {
+      //set inputs
+      inputs = training_data[j] + 1;
 
-            //set desired outputs
+      //set desired outputs
 			if(training_data[j][0] < parm.lowCutoffNorm)
 			{
 				a1 = 1;
@@ -625,78 +704,90 @@ void C_Net::fullTrainingRun(bool print)
 			desired_outputs[1] = a2;
 			desired_outputs[2] = a3;
 
-            UpdateNet();
+      UpdateNet();
 
-            //add s_errror
-            output_diff1 = abs((desired_outputs[0] - outputs[0])/3.0);
-            output_diff2 = abs((desired_outputs[1] - outputs[1])/3.0);
-            output_diff3 = abs((desired_outputs[2] - outputs[2])/3.0);
-            output_diff1 = output_diff1 + output_diff2 + output_diff3;
-            s_error += output_diff1*output_diff1;
+      //add s_errror
+      output_diff1 = abs((desired_outputs[0] - outputs[0])/3.0);
+      output_diff2 = abs((desired_outputs[1] - outputs[1])/3.0);
+      output_diff3 = abs((desired_outputs[2] - outputs[2])/3.0);
+      output_diff1 = output_diff1 + output_diff2 + output_diff3;
+      s_error += output_diff1*output_diff1;
 
+      RunTrainingCycle();
 
-            RunTrainingCycle();
+    }
 
-        }
+    s_error = s_error/(double)sets_training_data;
 
-        s_error = s_error/(double)sets_training_data;
-
-        //checks if we want epoch number printed
-        if (print)
-        {
-        	if (( (i+1) % 10 ) == 0)
-
-        		printEpoch(i+1, s_error);
-        }
+    //checks if we want epoch number printed
+    if (print)
+    {
+     	if (( (i+1) % 10 ) == 0)
+     		printEpoch(i+1, s_error);
+    }
 	}
 
 }
 
+/*******************************************************
+Function: C_Net::testRun()
+Author: 
+
+Description: 
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
+
 void C_Net::testRun()
 {
-    int i, j;
+  int i, j;
 	int a1, a2, a3;
-        //loop through training sets
-        for(j=0; j<sets_training_data; j++)
-        {
-            //set inputs
-            inputs = training_data[j] + 1;
-			cout << "inputs: = ";
-			for (i = 0; i < parm.netLayerNodes[0]; i++)
-				cout << inputs[i] << " ";
-			cout << endl;
+  //loop through training sets
+  for(j=0; j<sets_training_data; j++)
+  {
+    //set inputs
+    inputs = training_data[j] + 1;
+		cout << "inputs: = ";
+		for (i = 0; i < parm.netLayerNodes[0]; i++)
+			cout << inputs[i] << " ";
+		cout << endl;
 
-            //set desired outputs
-			if(training_data[j][0] < parm.lowCutoffNorm)
-			{
-				a1 = 1;
-				a2 = 0;
-				a3 = 0;
-			}
-			else if(training_data[j][0] < parm.mediumCutoffNorm)
-			{
-				a1 = 0;
-				a2 = 1;
-				a3 = 0;
-			}
-			else
-			{
-				a1 = 0;
-				a2 = 0;
-				a3 = 1;
-			}
+    //set desired outputs
+		if(training_data[j][0] < parm.lowCutoffNorm)
+		{
+			a1 = 1;
+			a2 = 0;
+			a3 = 0;
+		}
+		else if(training_data[j][0] < parm.mediumCutoffNorm)
+		{
+			a1 = 0;
+			a2 = 1;
+			a3 = 0;
+		}
+		else
+		{
+			a1 = 0;
+			a2 = 0;
+			a3 = 1;
+		}
 
-            UpdateNet();
+    UpdateNet();
 
-			desired_outputs[0] = a1;
-			desired_outputs[1] = a2;
-			desired_outputs[2] = a3;
+		desired_outputs[0] = a1;
+		desired_outputs[1] = a2;
+		desired_outputs[2] = a3;
 
-            cout << "Desired Output: " << desired_outputs[0] <<
-                ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-                ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
-                << outputs[2] << endl;
-        }
+    cout << "Desired Output: " << desired_outputs[0] <<
+      ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+      ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+      << outputs[2] << endl;
+  }
 }
 
 void C_Net::CVtestRun()
@@ -740,42 +831,6 @@ void C_Net::CVtestRun()
      << outputs[2] << endl;
 }
 
-/**************************************************************************//**
- * @Description - This function has to run a test run of the Neural Net
- *	It has to save these values so they can be compared against the "Actual"
- *  value.
- *
- *
- *//**************************************************************************/
-void C_Net::fowardRunData()
-{
-	//for each node in each hidden layer.
-	for (int i = 0; i < parm.layers; i++)
-	{
-		//take the value of the layer before it multiplied by the weight connecting
-		//it
-		//Add these all together... but keep a different tally for PDSI and acrees
-		//burned
-	}
-
-}
-
-/**************************************************************************//**
- * @Description - This function has to back though the weights and modify
- *   Their values based on success and falure. If the test was succesful this
- *   Should not be run. If the test failed then the values will be modified
- *   by the training value.
- *
- *
- *//**************************************************************************/
-void C_Net::backwardsTrain()
-{
-	//This has to back up though the array, adding the training value to weights
-	//that led to sucess and subtracting from weights that led to falure <- if
-	//there was a falure.
-	UpdateNet();
-
-}
 
 void C_Net::setData(Parameters newData)
 {
@@ -802,7 +857,7 @@ unsigned int C_Net::TestNet(void)
 
 unsigned int C_Net::CrossValidateNet(void)
 {
-	/*int i, j, m;
+	int i, j, m;
 
 	double temp;	
 	
@@ -855,7 +910,7 @@ unsigned int C_Net::CrossValidateNet(void)
 		sets_training_data++;
 	}
 
-	//print test results */
+	//print test results 
 	return 0;
 }
 

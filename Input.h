@@ -16,8 +16,6 @@ public:
 
 	Input( string paramFileName );
 
-	Input();
-
 	~Input();
 
 	bool parseParams();
@@ -26,7 +24,6 @@ public:
 	Parameters getData();
 
 	bool openFile(ifstream &fin);
-
 
 	//data
 	Parameters parm;
