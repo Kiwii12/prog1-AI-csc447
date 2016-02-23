@@ -30,7 +30,7 @@ weights.wts     # name of ANN weight file
 # training and testing data file
 #-------------------------------
 
-datafile.csv
+PDSI_NW_1998-2015.csv
 
 #------------------------------------------
 # input feature vector info:
