@@ -397,8 +397,6 @@ bool C_Net::readInData()
 
     }
 
-
-
 	return false;
 }
 
