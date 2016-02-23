@@ -700,7 +700,48 @@ void C_Net::testRun()
         }
 }
 
+void C_Net::CVtestRun()
+{
+	int i, j;
+	int a1, a2, a3;
+  //loop through training sets
+  cout << "starting cross validation test run" << endl;
+  //set inputs
+  inputs = training_data[sets_training_data] + 1;
+  cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
+  //set desired outputs
+  if(training_data[j][0] < parm.lowCutoffNorm)
+	{
+  	a1 = 1;
+		a2 = 0;
+		a3 = 0;
+	}
+	else if(training_data[j][0] < parm.mediumCutoffNorm)
+	{
+		a1 = 0;
+		a2 = 1;
+		a3 = 0;
+	}
+	else
+	{
+		a1 = 0;
+		a2 = 0;
+		a3 = 1;
+	}
+          
+  UpdateNet();
+          
+  cout << "finished foward run" << endl;
+            
+  desired_outputs[0] = a1;
+	desired_outputs[1] = a2;
+	desired_outputs[2] = a3;
 
+  cout << "Desired Output: " << desired_outputs[0] <<
+    ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+    ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+     << outputs[2] << endl;
+}
 
 /**************************************************************************//**
  * @Description - This function has to run a test run of the Neural Net
@@ -803,11 +844,10 @@ unsigned int C_Net::CrossValidateNet(void)
 		sets_training_data--;
 		// train on remeaining data
 		
-
 		fullTrainingRun(false);
 
 		// test on training_data[i][all]
-		// cvTestRun()
+		CVtestRun();
 		// reset training_data and sets_training_data
 		for (j = 0; j < m; j++)
 		{

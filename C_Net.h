@@ -97,6 +97,9 @@ public:
     //completes the test cycle
     void testRun();
 
+    //completes the test cycle for cross validation 
+    void CVtestRun();
+
 	//Does a test run of the net
 	void fowardRunData();
 
