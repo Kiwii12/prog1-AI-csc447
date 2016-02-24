@@ -611,12 +611,12 @@ void C_Net::UpdateNet(void)
 
 			//set output values
 			if(i == (parm.layers - 1))
-            {
-                outputs[j] = layers[i].node_activation[j];
+      {
+        outputs[j] = layers[i].node_activation[j];
 #ifdef c_net_debug
     debug_log << "setting output " << j << " = " << outputs[j] << "\n";
 #endif // c_net_debug
-            }
+      }
 		}
 	}
 }
@@ -868,14 +868,16 @@ void C_Net::testRun()
   int i, j;
 	int a1, a2, a3;
   //loop through training sets
+  cout << "Year, Actual, Predicted" << endl;
+
   for(j=0; j<sets_training_data; j++)
   {
     //set inputs
     inputs = training_data[j] + 1;
-		cout << "inputs: = ";
-		for (i = 0; i < parm.netLayerNodes[0]; i++)
-			cout << inputs[i] << " ";
-		cout << endl;
+		// cout << "inputs: = ";
+		// for (i = 0; i < parm.netLayerNodes[0]; i++)
+		// 	cout << inputs[i] << " ";
+		// cout << endl;
 
     //set desired outputs
 		if(training_data[j][0] < parm.lowCutoffNorm)
@@ -903,10 +905,13 @@ void C_Net::testRun()
 		desired_outputs[1] = a2;
 		desired_outputs[2] = a3;
 
-    cout << "Desired Output: " << desired_outputs[0] <<
-      ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-      ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
-      << outputs[2] << endl;
+    // cout << "Desired Output " << j << " : " << desired_outputs[0] <<
+    //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+    //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+    //   << outputs[2] << endl;
+  
+  	printResults(j);
+
   }
 }
 
@@ -914,7 +919,7 @@ void C_Net::testRun()
 Function: C_Net::CVtestRun()
 Author: 
 
-Description: Tests a sing year of data. Used for testing 
+Description: Tests a single year of data. Used for testing 
 with cross validation
 
 Parameters:
@@ -927,21 +932,21 @@ Return:
 
 void C_Net::CVtestRun()
 {
-	int i, j;
+	int i;
 	int a1, a2, a3;
   //loop through training sets
-  cout << "starting cross validation test run" << endl;
+  //cout << "starting cross validation test run" << endl;
   //set inputs
-  inputs = training_data[sets_training_data] + 1;
-  cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
+  //inputs = training_data[sets_training_data] + 1;
+  //cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
   //set desired outputs
-  if(training_data[j][0] < parm.lowCutoffNorm)
+  if(training_data[sets_training_data-1][0] < parm.lowCutoffNorm)
 	{
   	a1 = 1;
 		a2 = 0;
 		a3 = 0;
 	}
-	else if(training_data[j][0] < parm.mediumCutoffNorm)
+	else if(training_data[sets_training_data-1][0] < parm.mediumCutoffNorm)
 	{
 		a1 = 0;
 		a2 = 1;
@@ -960,10 +965,12 @@ void C_Net::CVtestRun()
 	desired_outputs[1] = a2;
 	desired_outputs[2] = a3;
 
-  cout << "Desired Output: " << desired_outputs[0] <<
-    ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-    ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
-     << outputs[2] << endl;
+  // cout << "Desired Output: " << desired_outputs[0] <<
+  //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+  //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+  //    << outputs[2] << endl;
+
+  printResults(sets_training_data);
 }
 
 /*******************************************************
@@ -1050,25 +1057,37 @@ Return:
 
 unsigned int C_Net::CrossValidateNet(void)
 {
-	int i, j, m;
+	int i, j, k, m;
 
 	double temp;
 
 	Initialize();
 	readInData();
 
-	m = parm.PDSIdata + parm.burnedAcreage;
+	m = parm.PDSIdata + parm.burnedAcreage + 2;
 
-	double temp_training_data[sets_training_data][m];
+	//double temp_training_data[sets_training_data][m];
+
+	temp_training_data = new double*[sets_training_data];
+
+    for( i=0; i<sets_training_data; i++)
+    {
+        temp_training_data[i] = new double[m];
+    }
 
   //put clean copy of training data in temp
+
+  cout << "Year, Actual, Predicted" << endl;  
+
   for (i = 0; i < sets_training_data; i++)
   {
-  	temp_training_data[i][0] = training_data[i][0];
+  	//temp_training_data[i][0] = training_data[i][0];
   	for (j = 0; j < m; j++)
   	{
+  		// cout << training_data[i][j] << " ";
   		temp_training_data[i][j] = training_data[i][j];
   	}
+  	// cout << endl;
   }
 
 	for (i = 0; i < sets_training_data; i++)
@@ -1078,6 +1097,8 @@ unsigned int C_Net::CrossValidateNet(void)
 		{
 			SetSmallRandomWeights();
 		}
+
+		// cout << training_data[i][m-1] << endl;
 
 		//swtiches point that will be tested with last point
 		for (j = 0; j < m; j++)
@@ -1093,16 +1114,29 @@ unsigned int C_Net::CrossValidateNet(void)
 		fullTrainingRun(false);
 
 		// test on training_data[i][all]
+		// cout << training_data[sets_training_data][m-1] << endl;
 		CVtestRun();
-		// reset training_data and sets_training_data
-		for (j = 0; j < m; j++)
-		{
-			training_data[i][j] = temp_training_data[i][j];
-			training_data[sets_training_data][j] = temp_training_data[sets_training_data][j];
-		}
+
 		sets_training_data++;
+
+		// reset training_data and sets_training_data
+		for (k = 0; k < sets_training_data; k++)
+  	{
+  		//temp_training_data[k][0] = training_data[k][0];
+  		for (j = 0; j < m; j++)
+  		{
+  		// cout << training_data[i][j] << " ";
+  			training_data[k][j] = temp_training_data[k][j];
+  		}
+  	// cout << endl;
+  	}
 	}
 
+	for( i=0; i<sets_training_data; i++)
+    {
+        delete[] temp_training_data[i];
+    }
+	delete[] temp_training_data;
 
 	//print test results 
 	return 0;
@@ -1116,6 +1150,7 @@ Description: This function prints the epoch number and
 the root mean square error to the command line.
 
 Parameters:
+	eNum					- epoch number
 	squareError 	- mean squared error that is calculated
 
 Return:
@@ -1149,10 +1184,29 @@ Return:
 	None
 
 ********************************************************/
-void C_Net::printResults()
+void C_Net::printResults(int rowNum)
 {
 
-	cout << "Year, Actual, Predicted" << endl;
+	cout << training_data[rowNum][parm.netLayerNodes[0] + 1] << ", " << 
+	desired_outputs[0] << desired_outputs[1] << desired_outputs[2] << ", " 
+	<< int(outputs[0] + .5) << int(outputs[1] + .5) << int(outputs[2] + .5);
+	
+	if ((desired_outputs[0] != int(outputs[0] + .5)) ||
+		(desired_outputs[1] != int(outputs[1] + .5)) || 
+		(desired_outputs[2] != int(outputs[2] + .5)))
+	{
+		cout << ", *";
+	}
+
+
+
+	cout << endl;
+
+	// cout << "Desired Output " << j << " : " << desired_outputs[0] <<
+    //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+    //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+    //   << outputs[2] << endl;
+
 	/*************
 	for (int i = 0; i < years; i++)
 	{

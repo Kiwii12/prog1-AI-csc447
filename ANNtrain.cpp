@@ -56,8 +56,8 @@ int main(int argc, char** argv)
 	//Passes ParamFile to the net
 	net.setData(parameters.getData());
 
+	//net.TrainNet();
 	net.TrainNet();
-	
 	return 0;
 }
 
