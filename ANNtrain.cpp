@@ -58,7 +58,6 @@ int main(int argc, char** argv)
 
 	//net.TrainNet();
 	net.TrainNet();
-
 	return 0;
 }
 
