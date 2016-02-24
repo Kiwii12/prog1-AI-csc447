@@ -1,6 +1,15 @@
 How well does your network train?
-It changes but gets no closer or farther from the answer.
+On the bh data the RMS error starts at about 0.44 and is at 0.17 after 1000 Epochs. Furthur training brings the RMS to 0.098. It slows down after this but keeps going down.
+On the nw data the RMS error starts at about 0.46 and is at 0.025 after 1000 Epochs. Furthur training brings the RMS to 0.0013 and was still dropping with more training.
+
 What is the impact of network topology (i.e., changing the number of hidden layer nodes) on training?
-The program will work with multiple hidden layers. However, no network typology will let it train.
+Decreasing the bh.prm hidden layer nodes from 4 to 2 nodes resulted in an increase in RMS error.
+Increasing the bh.prm hidden layer nodes from 4 to 6 nodes resulted much better training. The RMS error reached the cutoff value.
+Increasing the bh.prm hidden layer nodes from 4 to 8 nodes resulted in a quicker training, but it got stuck at about 0.138.
+Increasing furthur to 10 nodes resulted in it getting stuck at about 0.195.
+
 How well does the network generalize from training data to testing data?
-Due to not training, the percent right varies significantly.
+Training on the bh data and then testing on the nw data resulted in a 33.33% correct test.
+Training on the nw data and then testing on the bh data resulted in a 40% correct test.
+
+
