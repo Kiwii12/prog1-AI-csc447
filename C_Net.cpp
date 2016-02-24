@@ -636,11 +636,16 @@ Return:
 ********************************************************/
 void C_Net::RunTrainingCycle(void)
 {
+#ifdef c_net_debug
+    debug_log << "\n\n\n\n\nStarting TrainingCycle...\n";
+    debug_log << "Looping through " << parm.layers << " layers\n";
+#endif // c_net_debug
+
 	int i, j, k, l;
 	int nodes;
 	int nodes_prev;
 	int nodes_next;
-  double delta;
+    double delta;
 	double activation;
 	double deltaWSum;
 	//loop through layers
@@ -650,10 +655,20 @@ void C_Net::RunTrainingCycle(void)
 		nodes = parm.netLayerNodes[i+1];
 		//number of nodes in previous layer
 		nodes_prev = parm.netLayerNodes[i];
+
+#ifdef c_net_debug
+    debug_log << "Processing layer " << i << "\n\n\n";
+    debug_log << "Nodes in current layer: " << nodes << "\n";
+    debug_log << "Nodes in previous layer: " << nodes_prev << "\n";
+#endif // c_net_debug
+
 		//number of nodes in next layer (unless output layer)
 		if(i < (parm.layers - 1))
 		{
 		    nodes_next = parm.netLayerNodes[i + 2];
+#ifdef c_net_debug
+    debug_log << "Nodes in next layer: " << nodes_next << "\n";
+#endif // c_net_debug
 	    }
 
 		//loop through nodes
@@ -662,15 +677,28 @@ void C_Net::RunTrainingCycle(void)
 
             activation = layers[i].node_activation[j];
 
+#ifdef c_net_debug
+    debug_log << "Processing node " << j << " \n\n";
+    debug_log << "activation value " << activation << "\n";
+#endif // c_net_debug
+
             //check if output layer
             if(i == (parm.layers - 1))
             {
                 delta = activation*(1 - activation)*(desired_outputs[j] - activation);
             }
 
+#ifdef c_net_debug
+    debug_log << "desired output " << j << " = " << desired_outputs[j] << "\n";
+    debug_log << "looping through " << nodes_prev + 1 << " weights\n";
+#endif // c_net_debug
+
 			//loop through weights
 			for( k=0; k<(nodes_prev + 1); k++)
 			{
+#ifdef c_net_debug
+    debug_log << "Processing weight " << k << "\n";
+#endif // c_net_debug
 			    //not output layer
                 if(i != (parm.layers - 1))
                 {
@@ -680,17 +708,32 @@ void C_Net::RunTrainingCycle(void)
                     {
                         deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
                     }
+#ifdef c_net_debug
+    debug_log << "deltaWSum = " << deltaWSum << "\n";
+#endif // c_net_debug
                     delta = activation*(1 - activation)*(deltaWSum);
                 }
+#ifdef c_net_debug
+    debug_log << "delta = " << delta << "\n";
+#endif // c_net_debug
 
 				//set deltaW
 				layers[i].deltaW[j*(nodes_prev + 1) + k] = delta*layers[i].weights[j*(nodes_prev + 1) + k];
+
+#ifdef c_net_debug
+    debug_log << "weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
+    debug_log << "deltaW " << j << ", " << k << " = " << layers[i].deltaW[j*(nodes_prev + 1) + k] << "\n";
+#endif // c_net_debug
 
 				//adjust weight
 				if(k == nodes_prev)
 				{
 					//bias weight
 					layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;
+#ifdef c_net_debug
+    debug_log << "bias weight\n" << "weight change = " << parm.learningRate*delta << "\n";
+    debug_log << "new weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
+#endif // c_net_debug
 				}
 				else
 				{
@@ -698,6 +741,10 @@ void C_Net::RunTrainingCycle(void)
 					if(i == 0)
 					{
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*inputs[k];
+#ifdef c_net_debug
+    debug_log << "input layer\n" << "weight change = " << parm.learningRate*delta*inputs[k] << "\n";
+    debug_log << "new weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
+#endif // c_net_debug
 					}
 					else
 					{
@@ -706,6 +753,11 @@ void C_Net::RunTrainingCycle(void)
                         //    layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;
                         //}
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
+#ifdef c_net_debug
+    debug_log << "weight change = " << parm.learningRate*delta*layers[i - 1].node_activation[k] << "\n";
+    debug_log << "new weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
+#endif // c_net_debug
+
 					}
 				}
 			}
@@ -852,7 +904,7 @@ void C_Net::testRun()
 
     cout << "Desired Output: " << desired_outputs[0] <<
       ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-      ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+      ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
       << outputs[2] << endl;
   }
 }
@@ -909,7 +961,7 @@ void C_Net::CVtestRun()
 
   cout << "Desired Output: " << desired_outputs[0] <<
     ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-    ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
+    ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
      << outputs[2] << endl;
 }
 
