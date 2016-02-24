@@ -1,3 +1,18 @@
+/***************************************
+Artificial Intelligence
+Program 1 - Wildfire Prediction
+
+Authors: Jacob St. Amand, Johnathan Avkerman, and  Allison Bodvig
+
+Due Date: February 24, 2016
+
+Description: 
+
+
+Usage: ANNtest <parameter>
+
+****************************************/
+
 #include "C_Net.h"
 #include "Input.h"
 

@@ -19,8 +19,7 @@ struct Parameters
 	double momentum;
 	double threshold;
 	int layers;
-
-	//todo convert prms[6] to int array[layers]
+	
 	int *netLayerNodes;
 
 	string dataFile; //training and testing data file

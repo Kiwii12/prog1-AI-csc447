@@ -6,7 +6,7 @@
 Function: C_Net::C_Net()
 Author: 
 
-Description: 
+Description: Constructor 
 
 Parameters:
 	None
@@ -71,13 +71,6 @@ Return:
 ********************************************************/
 unsigned int C_Net::Initialize()
 {
-	//Make sure setData is called before this function!!!
-
-	//memory allocation
-
-	//inputs will be the number of nodes in the first layer
-	//inputs = new double[parm.netLayerNodes[0]];
-
 	//output will be the number of nodes in the last layer
 	outputs = new double[parm.netLayerNodes[parm.layers]];
 

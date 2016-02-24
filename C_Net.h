@@ -23,6 +23,10 @@ struct T_Layer
 class C_Net
 {
 public:
+
+/******************************************************************************
+*                         Function Prototypes
+******************************************************************************/
     C_Net();
     ~C_Net();
     unsigned int Initialize();
@@ -78,8 +82,6 @@ private:
     unsigned int num_layers;
     unsigned int* num_nodes_in_each_layer;
 
-    //this should be num_layers - 1 (input layer has no weights)
-    //number of weights in each layer is nodes in layer * nodes in previous layer
     T_Layer* layers;
 
 	int sets_training_data;
@@ -88,11 +90,8 @@ private:
 	int sets_testing_data;
 	double** testing_data;
 
-    //training parameters variables need to be added here as well
-    //double learning_rate //<-- is learning_rate the only one?
-
 	Parameters parm;
 
 };
 
-#endif // _C_NET_H_
+#endif

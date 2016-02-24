@@ -58,6 +58,9 @@ Author: Allison Bodvig
 Description: Reads in the parameter file and puts each
 value in a separate row in the prms array
 
+Parameters:
+	None
+
 Return:
 	returns true if the parameter file was read in
 
