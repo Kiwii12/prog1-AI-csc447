@@ -2,6 +2,8 @@
 #include <cstring>
 #include <algorithm>
 
+
+//If the below is uncommeted, Much debug information will be outputted
 //#define c_net_debug
 
 #ifdef c_net_debug
@@ -13,7 +15,7 @@
 Function: C_Net::C_Net()
 Author: Jacob
 
-Description: Constructor
+Description: Constructor - nothing to initialize here
 
 Parameters:
 	None
