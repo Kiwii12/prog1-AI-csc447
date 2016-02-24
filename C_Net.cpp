@@ -107,8 +107,16 @@ unsigned int C_Net::Initialize()
 		layers[i].node_value = new double[nodes];
 	}
 
-	//Train Function ALWAYS starts with new weights
-	SetSmallRandomWeights();
+    ifstream fin;
+    fin.open(parm.weightsFile);
+    if( !fin.fail())
+       {
+           LoadWeightsFromFile();
+       }
+       else {
+	  //Train Function ALWAYS starts with new weights
+	   SetSmallRandomWeights();
+       }
 
     return 0;
 }
