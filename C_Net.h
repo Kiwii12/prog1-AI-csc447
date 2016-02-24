@@ -48,11 +48,11 @@ public:
 
 	//completes the training cycle
 	void fullTrainingRun(bool print);
-
+    
     //completes the test cycle
     void testRun();
 
-    //completes the test cycle for cross validation
+    //completes the test cycle for cross validation 
     void CVtestRun();
 
 	//Needs to get the param file data <- pulled from ANN.h
@@ -86,6 +86,7 @@ private:
 
 	int sets_training_data;
 	double** training_data;
+    double** temp_training_data;
 
 	int sets_testing_data;
 	double** testing_data;

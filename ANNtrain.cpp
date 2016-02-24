@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	net.setData(parameters.getData());
 
 	//net.TrainNet();
-	net.TestNet();
+	net.TrainNet();
 
 	return 0;
 }

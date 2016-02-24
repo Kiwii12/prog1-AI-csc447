@@ -603,12 +603,12 @@ void C_Net::UpdateNet(void)
 
 			//set output values
 			if(i == (parm.layers - 1))
-            {
-                outputs[j] = layers[i].node_activation[j];
+      {
+        outputs[j] = layers[i].node_activation[j];
 #ifdef c_net_debug
     debug_log << "setting output " << j << " = " << outputs[j] << "\n";
 #endif // c_net_debug
-            }
+      }
 		}
 	}
 }
@@ -895,7 +895,7 @@ void C_Net::testRun()
 		desired_outputs[1] = a2;
 		desired_outputs[2] = a3;
 
-    cout << "Desired Output: " << desired_outputs[0] <<
+    cout << "Desired Output " << j << " : " << desired_outputs[0] <<
       ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
       ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
       << outputs[2] << endl;
@@ -906,7 +906,7 @@ void C_Net::testRun()
 Function: C_Net::CVtestRun()
 Author: 
 
-Description: Tests a sing year of data. Used for testing 
+Description: Tests a single year of data. Used for testing 
 with cross validation
 
 Parameters:
@@ -919,7 +919,7 @@ Return:
 
 void C_Net::CVtestRun()
 {
-	int i, j;
+	int i;
 	int a1, a2, a3;
   //loop through training sets
   cout << "starting cross validation test run" << endl;
@@ -927,13 +927,13 @@ void C_Net::CVtestRun()
   inputs = training_data[sets_training_data] + 1;
   cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
   //set desired outputs
-  if(training_data[j][0] < parm.lowCutoffNorm)
+  if(training_data[sets_training_data-1][0] < parm.lowCutoffNorm)
 	{
   	a1 = 1;
 		a2 = 0;
 		a3 = 0;
 	}
-	else if(training_data[j][0] < parm.mediumCutoffNorm)
+	else if(training_data[sets_training_data-1][0] < parm.mediumCutoffNorm)
 	{
 		a1 = 0;
 		a2 = 1;
@@ -1051,9 +1051,17 @@ unsigned int C_Net::CrossValidateNet(void)
 
 	m = parm.PDSIdata + parm.burnedAcreage;
 
-	double temp_training_data[sets_training_data][m];
+	//double temp_training_data[sets_training_data][m];
+
+	temp_training_data = new double*[sets_training_data];
+
+    for( i=0; i<sets_training_data; i++)
+    {
+        temp_training_data[i] = new double[m];
+    }
 
   //put clean copy of training data in temp
+
   for (i = 0; i < sets_training_data; i++)
   {
   	temp_training_data[i][0] = training_data[i][0];
@@ -1086,6 +1094,8 @@ unsigned int C_Net::CrossValidateNet(void)
 
 		// test on training_data[i][all]
 		CVtestRun();
+
+
 		// reset training_data and sets_training_data
 		for (j = 0; j < m; j++)
 		{
@@ -1095,6 +1105,11 @@ unsigned int C_Net::CrossValidateNet(void)
 		sets_training_data++;
 	}
 
+	for( i=0; i<sets_training_data; i++)
+    {
+        delete[] temp_training_data[i];
+    }
+	delete[] temp_training_data;
 
 	//print test results 
 	return 0;
@@ -1108,6 +1123,7 @@ Description: This function prints the epoch number and
 the root mean square error to the command line.
 
 Parameters:
+	eNum					- epoch number
 	squareError 	- mean squared error that is calculated
 
 Return:
