@@ -940,13 +940,13 @@ void C_Net::CVtestRun()
   //inputs = training_data[sets_training_data] + 1;
   //cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
   //set desired outputs
-  if(training_data[sets_training_data-1][0] < parm.lowCutoffNorm)
+  if(training_data[sets_training_data][0] < parm.lowCutoffNorm)
 	{
   	a1 = 1;
 		a2 = 0;
 		a3 = 0;
 	}
-	else if(training_data[sets_training_data-1][0] < parm.mediumCutoffNorm)
+	else if(training_data[sets_training_data][0] < parm.mediumCutoffNorm)
 	{
 		a1 = 0;
 		a2 = 1;
