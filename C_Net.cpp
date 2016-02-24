@@ -69,12 +69,6 @@ C_Net::~C_Net()
 	delete[] outputs;
 
 }
-
-//set values and allocate all needed memory
-unsigned int C_Net::Initialize()
-{
-
-
 /*******************************************************
 Function: C_Net::Initialize()
 Author: 
@@ -615,10 +609,8 @@ void C_Net::UpdateNet(void)
     debug_log << "setting output " << j << " = " << outputs[j] << "\n";
 #endif // c_net_debug
             }
-
 		}
 	}
-
 }
 
 /*******************************************************
@@ -649,7 +641,7 @@ void C_Net::RunTrainingCycle(void)
 	double activation;
 	double deltaWSum;
 	//loop through layers
-	for( i=(parm.layers - 1); i>=0; i--)
+	for( i = (parm.layers - 1); i>=0; i--)
 	{
 		//number of nodes in current layer
 		nodes = parm.netLayerNodes[i+1];
@@ -713,6 +705,7 @@ void C_Net::RunTrainingCycle(void)
 #endif // c_net_debug
                     delta = activation*(1 - activation)*(deltaWSum);
                 }
+				
 #ifdef c_net_debug
     debug_log << "delta = " << delta << "\n";
 #endif // c_net_debug
@@ -1164,5 +1157,4 @@ void C_Net::printResults()
 
 
 	***************/
-
 }
