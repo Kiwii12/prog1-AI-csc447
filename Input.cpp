@@ -9,15 +9,39 @@
 #include <vector>
 #include <sstream>
 
+/*******************************************************
+Function: Input::Input()
+Author: 
+
+Description: This function sets the name of the parameter
+file
+
+Parameters:
+	paramFileName		- the name of the parameter file
+
+Return:
+	None
+
+********************************************************/
+
 Input::Input( string paramFileName )
 {
 	parm.paramFile = paramFileName;
 }
 
-Input::Input()
-{
-	parm.paramFile = "Parameter.prm";
-}
+/*******************************************************
+Function:Input::~Input()
+Author: 
+
+Description: Deallocates all the dynmaically allocated arrays
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 
 Input::~Input()
 {
@@ -28,17 +52,19 @@ Input::~Input()
 }
 
 /*******************************************************
-Function: parseParams
+Function: Input::parseParams()
 Author: Allison Bodvig
 
 Description: Reads in the parameter file and puts each
 value in a separate row in the prms array
 
+Parameters:
+	None
+
 Return:
 	returns true if the parameter file was read in
 
 ********************************************************/
-//author - Allison
 bool Input::parseParams()
 {
 	char line[256] = { 0 };
@@ -105,6 +131,21 @@ bool Input::parseParams()
 	return true;
 }
 
+/*******************************************************
+Function: Input::setData()
+Author: 
+
+Description: sets the data read in fromt he parameters 
+file to the parm structure
+
+Parameters:
+	prms 		- 2D array of the parameters that were read in
+
+Return:
+	None
+
+********************************************************/
+
 void Input::setData(char prms[20][50])
 {
 	parm.weightsFile = prms[0];
@@ -141,10 +182,39 @@ void Input::setData(char prms[20][50])
 	//High is anything above the medium cutoff
 }
 
+/*******************************************************
+Function: Input::getData()
+Author: 
+
+Description: Returns the parameters
+
+Parameters:
+	None
+
+Return:
+	parm which holds the paramters from the parameter fiel
+
+********************************************************/
+
 Parameters Input::getData()
 {
 	return parm;
 }
+
+/*******************************************************
+Function: Input::openFile()
+Author: 
+
+Description: Checks if the file can be opened or not. Prints
+error messagae and returns false if the file was not found.
+
+Parameters:
+	fin 	- file that is to be opened
+
+Return:
+	True or false depending on if the file was opened or not
+
+********************************************************/
 
 bool Input::openFile( ifstream &fin )
 {

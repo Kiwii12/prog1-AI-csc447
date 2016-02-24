@@ -1,6 +1,37 @@
+/***************************************
+Artificial Intelligence
+Program 1 - Wildfire Prediction
+
+Authors: Jacob St. Amand, Johnathan Avkerman, and  Allison Bodvig
+
+Due Date: February 24, 2016
+
+Description: 
+
+
+Usage: ANNtest <parameter>
+
+****************************************/
+
 #include "C_Net.h"
 #include "Input.h"
 
+/*******************************************************
+Function: main
+Author: 
+
+Description: This function checks for correct usage and then
+calls the appropiate functions to read in the parameters file
+and use cross validation to train and test the data.
+
+Parameters:
+	argc  		- number of arguments
+	argv	 		- list og arguments from the command line
+
+Return:
+	None
+
+*****************************************************/
 
 int main(int argc, char** argv)
 {
