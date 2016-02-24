@@ -55,12 +55,11 @@ C_Net::~C_Net()
 	for (i = 0; i<parm.layers; i++)
 	{
 		delete[] layers[i].weights;
-		delete[] layers[i].delta;
-		delete[] layers[i].delta_prev;
 		delete[] layers[i].deltaW;
 		delete[] layers[i].deltaW_prev;
 		delete[] layers[i].node_activation;
 		delete[] layers[i].node_value;
+		delete[] layers[i].node_error;
 	}
 	for( i=0; i<sets_training_data; i++)
     {
@@ -105,13 +104,12 @@ unsigned int C_Net::Initialize()
 		//account for bias weights
 		count = nodes*nodes_prev + nodes;
 		layers[i].weights = new double[count];
-		layers[i].delta = new double[count];
-		layers[i].delta_prev = new double[count];
 		layers[i].deltaW = new double[count];
 		layers[i].deltaW_prev = new double[count];
 
 		layers[i].node_activation = new double[nodes];
 		layers[i].node_value = new double[nodes];
+		layers[i].node_error = new double[nodes];
 	}
 
     ifstream fin;
@@ -161,7 +159,6 @@ unsigned int C_Net::LoadWeightsFromFile()
 			//creates random weights bewtween [-1,1]
 			fin >> layers[i].weights[j];
             //also reset delta_prev, deltaW_prev
-			layers[i].delta_prev[j] = 0.0;
 			layers[i].deltaW_prev[j] = 0.0;
 		}
 	}
@@ -246,7 +243,6 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 			//creates random weights bewtween [-1,1]
 			layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
 			//also reset delta_prev, deltaW_prev
-			layers[i].delta_prev[j] = 0.0;
 			layers[i].deltaW_prev[j] = 0.0;
 		}
 	}
@@ -662,9 +658,12 @@ void C_Net::RunTrainingCycle(void)
 	int nodes;
 	int nodes_prev;
 	int nodes_next;
-    double delta;
 	double activation;
 	double deltaWSum;
+	double deltaW;
+	double deltaW_prev;
+
+	//first calculate error values
 	//loop through layers
 	for( i = (parm.layers - 1); i>=0; i--)
 	{
@@ -682,54 +681,93 @@ void C_Net::RunTrainingCycle(void)
 		//loop through nodes
 		for( j=0; j<nodes; j++)
 		{
-
+            //store the activation of the current node
             activation = layers[i].node_activation[j];
 
-            //check if output layer
+            //calculate error values
             if(i == (parm.layers - 1))
             {
-                delta = activation*(1 - activation)*(desired_outputs[j] - activation);
+                //output layer
+                layers[i].node_error[j] = activation*(1 - activation)*(desired_outputs[j] - activation);
             }
+            else
+            {
+                //hidden layer
+                deltaWSum = 0;
+                //sum all the deltaW of next layer
+                for( l=0; l<nodes_next; l++)
+                {
+                    deltaWSum += layers[i+1].node_error[l]*layers[i+1].weights[l*(nodes + 1) + j];
+                }
+
+                layers[i].node_error[j] = activation*(1 - activation)*(deltaWSum);
+
+            }
+		}
+	}
+
+    //now calculate weight changes
+    //and apply those changes
+	//loop through layers
+	for( i = (parm.layers - 1); i>=0; i--)
+	{
+		//number of nodes in current layer
+		nodes = parm.netLayerNodes[i+1];
+		//number of nodes in previous layer
+		nodes_prev = parm.netLayerNodes[i];
+
+		//number of nodes in next layer (unless output layer)
+		if(i < (parm.layers - 1))
+		{
+		    nodes_next = parm.netLayerNodes[i + 2];
+	    }
+
+		//loop through nodes
+		for( j=0; j<nodes; j++)
+		{
+            //store the activation of the current node
+            activation = layers[i].node_activation[j];
 
 			//loop through weights
 			for( k=0; k<(nodes_prev + 1); k++)
 			{
-			    //not output layer
-                if(i != (parm.layers - 1))
+
+                //store the previous deltaW
+                layers[i].deltaW_prev[j*(nodes_prev + 1) + k] = layers[i].deltaW[j*(nodes_prev + 1) + k];
+
+			    //check if input layer
+                if(i == 0)
                 {
-                    deltaWSum = 0;
-                    //sum all the deltaW of next layer
-                    for( l=0; l<nodes_next; l++)
+                    //bias weight
+                    if(k == nodes_prev)
                     {
-                        deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
+                        deltaW = parm.learningRate*layers[i].node_error[j];
                     }
-                    delta = activation*(1 - activation)*(deltaWSum);
+                    else
+                    {
+                        deltaW = parm.learningRate*layers[i].node_error[j]*inputs[k];
+                    }
+                }
+                else
+                {
+                    //bias weight
+                    if(k == nodes_prev)
+                    {
+                        deltaW = parm.learningRate*layers[i].node_error[j];
+                    }
+                    else
+                    {
+                        deltaW = parm.learningRate*layers[i].node_error[j]*layers[i-1].node_activation[k];
+                    }
                 }
 
+                //store deltaW
+                layers[i].deltaW[j*(nodes_prev + 1) + k] = deltaW;
 
-				//set deltaW
-				layers[i].deltaW[j*(nodes_prev + 1) + k] = delta*layers[i].weights[j*(nodes_prev + 1) + k];
+                //now change weights
+                deltaW_prev = layers[i].deltaW_prev[j*(nodes_prev + 1) + k];
+                layers[i].weights[j*(nodes_prev + 1) + k] += deltaW + parm.momentum*deltaW_prev;
 
-
-				//adjust weight
-				if(k == nodes_prev)
-				{
-					//bias weight
-					layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;
-				}
-				else
-				{
-					//input layer special case
-					if(i == 0)
-					{
-						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*inputs[k];
-					}
-					else
-					{
-					    layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
-
-					}
-				}
 			}
 		}
 	}
@@ -855,7 +893,7 @@ Return:
 
 void C_Net::testRun()
 {
-  int i, j;
+  int j;
 	int a1, a2, a3;
   //loop through training sets
   cout << "Year, Actual, Predicted" << endl;
@@ -923,7 +961,6 @@ Return:
 
 void C_Net::CVtestRun()
 {
-	int i;
 	int a1, a2, a3;
 
   if(training_data[sets_training_data][0] < parm.lowCutoffNorm)

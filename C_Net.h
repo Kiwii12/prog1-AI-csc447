@@ -13,14 +13,14 @@ struct T_Layer
     //number of weights will be nodes in layer[i] * nodes in layer[i-1]
     //all weights of node[0], then all weights of node[1], etc
     double* weights;
-	double* delta;
-	double* delta_prev;
 	double* deltaW;
 	double* deltaW_prev;
 
     //number of each below will be nodes in layer[i]
     double* node_activation;
     double* node_value;
+    double* node_error;
+
 };
 
 class C_Net
