@@ -10,7 +10,7 @@
 
 /*******************************************************
 Function: C_Net::C_Net()
-Author: 
+Author: Jacob
 
 Description: Constructor 
 
@@ -31,10 +31,10 @@ C_Net::C_Net()
 
 /*******************************************************
 Function: C_Net::~C_Net()
-Author: 
+Author: Jacob
 
-Description: deallocates all the dynamically allocated
-memory
+Description: Deallocates all the dynamically allocated
+memory.
 
 Parameters:
 	None
@@ -69,11 +69,12 @@ C_Net::~C_Net()
 	delete[] outputs;
 
 }
+
 /*******************************************************
 Function: C_Net::Initialize()
-Author: 
+Author: Jacob
 
-Description: Initializes the data.
+Description: Initializes the dynamically allocated memory
 
 Parameters:
 	None
@@ -124,7 +125,7 @@ unsigned int C_Net::Initialize()
 
 /*******************************************************
 Function: C_Net::LoadWeightsFromFile()
-Author: 
+Author: Johnathan
 
 Description: This function loads the weights from the 
 weights file. 
@@ -161,7 +162,7 @@ unsigned int C_Net::LoadWeightsFromFile()
 
 /*******************************************************
 Function: C_Net::SaveWeightsToFile()
-Author: 
+Author: Johnathan
 
 Description: This function writes the new weights to the 
 weights file
@@ -202,7 +203,7 @@ unsigned int C_Net::SaveWeightsToFile()
 
 /*******************************************************
 Function: C_Net::SetSmallRandomWeights()
-Author: Allison Bodvig
+Author: Allison
 
 Description: This function calculates random weights
 between -1 and 1.
@@ -242,7 +243,7 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 
 /*******************************************************
 Function: C_Net::findMin()
-Author: Allison Bodvig
+Author: Allison
 
 Description: This function finds the minimum value found
 in the array of values
@@ -277,7 +278,7 @@ float C_Net::findMin(float values[][13], int years, int vals)
 
 /*******************************************************
 Function: C_Net::findMax()
-Author: Allison Bodvig
+Author: Allison
 
 Description: This function finds the maximum value found
 in the array of values
@@ -310,7 +311,7 @@ float C_Net::findMax(float values[][13], int years, int vals)
 
 /*******************************************************
 Function: C_Net::normalize()
-Author: Allison Bodvig
+Author: Allison
 
 Description: This function finds the minimum values found
 in the list of values
@@ -333,7 +334,7 @@ float C_Net::normalize(float min, float max, float val)
 
 /*******************************************************
 Function: C_Net::readInData()
-Author: Allison Bodvig and Jacob St. Amand
+Author: Allison and Jacob
 
 Description: This function reads in the data from the 
 csv file and normalizes all the data. Also moves the data
@@ -477,7 +478,7 @@ bool C_Net::readInData()
 
 /*******************************************************
 Function: C_Net::randomizeTrainingSets()
-Author: 
+Author: Jacob
 
 Description: This function randomizes the trainging data
 
@@ -514,9 +515,12 @@ void C_Net::randomizeTrainingSets(void)
 
 /*******************************************************
 Function: C_Net::UpdateNet()
-Author: 
+Author: Jacob and Johnathan
 
-Description: 
+Description: This function loops through the weights and 
+changes the weight and stores the new value into a node. The 
+sum of the weights is then pushed through the sigmoid 
+functions. This is done for each layer in the network.
 
 Parameters:
 	None
@@ -623,9 +627,11 @@ void C_Net::UpdateNet(void)
 
 /*******************************************************
 Function: C_Net::RunTrainingCycle()
-Author: 
+Author: Jacob and Johnathan
 
-Description: 
+Description: This function goes backward through the net and 
+uses the delta training rule to calculate the new weights and
+applies the new weights as it goes through the net. 
 
 Parameters:
 	None
@@ -768,9 +774,12 @@ void C_Net::RunTrainingCycle(void)
 
 /*******************************************************
 Function: C_Net::fullTrainingRun()
-Author: 
+Author: Jacob, Johnathan, Allison
 
-Description: 
+Description: This function does a forward pass through the net
+to get hte outputs. Then runs backwards through the net to get
+the new weights. It cacluates and stores the error which is 
+printed to the console every 10 epochs.
 
 Parameters:
 	None
@@ -851,9 +860,10 @@ void C_Net::fullTrainingRun(bool print)
 
 /*******************************************************
 Function: C_Net::testRun()
-Author: 
+Author: Johnathan
 
-Description: Tests the array of data that is given
+Description: Tests the net given a weights file. Does a forward
+of the network then prints results to the console.
 
 Parameters:
 	None
@@ -917,10 +927,10 @@ void C_Net::testRun()
 
 /*******************************************************
 Function: C_Net::CVtestRun()
-Author: 
+Author: Johnathan and Allison
 
-Description: Tests a single year of data. Used for testing 
-with cross validation
+Description: Tests the a single point from the net. Does a forward
+of the network then prints the resutls to the console.
 
 Parameters:
 	None
@@ -934,12 +944,7 @@ void C_Net::CVtestRun()
 {
 	int i;
 	int a1, a2, a3;
-  //loop through training sets
-  //cout << "starting cross validation test run" << endl;
-  //set inputs
-  //inputs = training_data[sets_training_data] + 1;
-  //cout << inputs[0] << " is the first input " << training_data[sets_training_data][1] << endl;
-  //set desired outputs
+
   if(training_data[sets_training_data][0] < parm.lowCutoffNorm)
 	{
   	a1 = 1;
@@ -965,11 +970,6 @@ void C_Net::CVtestRun()
 	desired_outputs[1] = a2;
 	desired_outputs[2] = a3;
 
-  // cout << "Desired Output: " << desired_outputs[0] <<
-  //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-  //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
-  //    << outputs[2] << endl;
-
   printResults(sets_training_data);
 }
 
@@ -986,7 +986,6 @@ Return:
 	None
 
 ********************************************************/
-
 void C_Net::setData(Parameters newData)
 {
 	parm = newData;
@@ -994,9 +993,9 @@ void C_Net::setData(Parameters newData)
 
 /*******************************************************
 Function: C_Net::TrainNet
-Author: 
+Author: Jacob, Johnathan, and Allison
 
-Description: Calls the functions to train the data 
+Description: Calls the functions to train the data. 
 
 Parameters:
 	None
@@ -1005,7 +1004,6 @@ Return:
 	None
 
 ********************************************************/
-
 unsigned int C_Net::TrainNet(void)
 {
 	Initialize();
@@ -1017,7 +1015,7 @@ unsigned int C_Net::TrainNet(void)
 
 /*******************************************************
 Function: C_Net::TestNet()
-Author: 
+Author: Jacob, Johnathan, and Allison
 
 Description: This function gets the data from the parameter
 file and then test the data
@@ -1029,7 +1027,6 @@ Return:
 	None
 
 ********************************************************/
-
 unsigned int C_Net::TestNet(void)
 {
     Initialize();
@@ -1045,7 +1042,7 @@ unsigned int C_Net::TestNet(void)
 
 /*******************************************************
 Function: C_Net::CrossValidateNet()
-Author: 
+Author: Jacob, Johnathan, and Allison
 
 Description: Goes through the data and takes one point out, 
 trains on the rest and then tests the point that was taken
@@ -1058,7 +1055,6 @@ Return:
 	None
 
 ********************************************************/
-
 unsigned int C_Net::CrossValidateNet(void)
 {
 	int i, j, k, m;
@@ -1150,7 +1146,7 @@ unsigned int C_Net::CrossValidateNet(void)
 
 /*******************************************************
 Function: C_Net::printEpoch()
-Author: 
+Author: Allison
 
 Description: This function prints the epoch number and
 the root mean square error to the command line.
@@ -1177,7 +1173,7 @@ void C_Net::printEpoch(int eNum, double squareError)
 
 /*******************************************************
 Function: C_Net::printResults()
-Author: 
+Author: Allison, Johnathan
 
 Description: This function prints the year, actual fire
 severity and the predicted fire severity. If the actual 
@@ -1211,7 +1207,7 @@ void C_Net::printResults(int rowNum)
 
 /*******************************************************
 Function: C_Net::printError()
-Author: 
+Author: Allison 
 
 Description: Calculates and prints the percent correct
 from the testing and cross validates
