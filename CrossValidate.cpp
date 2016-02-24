@@ -18,7 +18,7 @@ Usage: ANNtest <parameter>
 
 /*******************************************************
 Function: main
-Author: 
+Author: Jacob, Johnathan, Allison
 
 Description: This function checks for correct usage and then
 calls the appropiate functions to read in the parameters file

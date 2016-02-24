@@ -203,7 +203,7 @@ Parameters Input::getData()
 
 /*******************************************************
 Function: Input::openFile()
-Author: 
+Author: Johnathan
 
 Description: Checks if the file can be opened or not. Prints
 error messagae and returns false if the file was not found.
