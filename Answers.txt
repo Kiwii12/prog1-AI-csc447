@@ -1,0 +1,6 @@
+How well does your network train?
+It changes but gets no closer or farther from the answer.
+What is the impact of network topology (i.e., changing the number of hidden layer nodes) on training?
+The program will work with multiple hidden layers. However, no network typology will let it train.
+How well does the network generalize from training data to testing data?
+Due to not training, the percent right varies significantly.
