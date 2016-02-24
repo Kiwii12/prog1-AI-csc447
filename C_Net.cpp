@@ -55,7 +55,10 @@ C_Net::~C_Net()
 	for (i = 0; i<parm.layers; i++)
 	{
 		delete[] layers[i].weights;
+		delete[] layers[i].delta;
+		delete[] layers[i].delta_prev;
 		delete[] layers[i].deltaW;
+		delete[] layers[i].deltaW_prev;
 		delete[] layers[i].node_activation;
 		delete[] layers[i].node_value;
 	}
@@ -102,14 +105,25 @@ unsigned int C_Net::Initialize()
 		//account for bias weights
 		count = nodes*nodes_prev + nodes;
 		layers[i].weights = new double[count];
+		layers[i].delta = new double[count];
+		layers[i].delta_prev = new double[count];
 		layers[i].deltaW = new double[count];
+		layers[i].deltaW_prev = new double[count];
 
 		layers[i].node_activation = new double[nodes];
 		layers[i].node_value = new double[nodes];
 	}
 
-	//Train Function ALWAYS starts with new weights
-	SetSmallRandomWeights();
+    ifstream fin;
+    fin.open(parm.weightsFile);
+    if( !fin.fail())
+       {
+           LoadWeightsFromFile();
+       }
+       else {
+	  //Train Function ALWAYS starts with new weights
+	   SetSmallRandomWeights();
+       }
 
     return 0;
 }
@@ -146,11 +160,15 @@ unsigned int C_Net::LoadWeightsFromFile()
 		{
 			//creates random weights bewtween [-1,1]
 			fin >> layers[i].weights[j];
+            //also reset delta_prev, deltaW_prev
+			layers[i].delta_prev[j] = 0.0;
+			layers[i].deltaW_prev[j] = 0.0;
 		}
 	}
 	fin.close();
     return 1;
 }
+
 
 /*******************************************************
 Function: C_Net::SaveWeightsToFile()
@@ -227,6 +245,9 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 		{
 			//creates random weights bewtween [-1,1]
 			layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
+			//also reset delta_prev, deltaW_prev
+			layers[i].delta_prev[j] = 0.0;
+			layers[i].deltaW_prev[j] = 0.0;
 		}
 	}
 
@@ -511,9 +532,9 @@ void C_Net::randomizeTrainingSets(void)
 Function: C_Net::UpdateNet()
 Author: Jacob and Johnathan
 
-Description: This function loops through the weights and 
-changes the weight and stores the new value into a node. The 
-sum of the weights is then pushed through the sigmoid 
+Description: This function loops through the weights and
+changes the weight and stores the new value into a node. The
+sum of the weights is then pushed through the sigmoid
 functions. This is done for each layer in the network.
 
 Parameters:
@@ -623,9 +644,9 @@ void C_Net::UpdateNet(void)
 Function: C_Net::RunTrainingCycle()
 Author: Jacob and Johnathan
 
-Description: This function goes backward through the net and 
+Description: This function goes backward through the net and
 uses the delta training rule to calculate the new weights and
-applies the new weights as it goes through the net. 
+applies the new weights as it goes through the net.
 
 Parameters:
 	None
@@ -636,10 +657,6 @@ Return:
 ********************************************************/
 void C_Net::RunTrainingCycle(void)
 {
-#ifdef c_net_debug
-    debug_log << "\n\n\n\n\nStarting TrainingCycle...\n";
-    debug_log << "Looping through " << parm.layers << " layers\n";
-#endif // c_net_debug
 
 	int i, j, k, l;
 	int nodes;
@@ -656,19 +673,10 @@ void C_Net::RunTrainingCycle(void)
 		//number of nodes in previous layer
 		nodes_prev = parm.netLayerNodes[i];
 
-#ifdef c_net_debug
-    debug_log << "Processing layer " << i << "\n\n\n";
-    debug_log << "Nodes in current layer: " << nodes << "\n";
-    debug_log << "Nodes in previous layer: " << nodes_prev << "\n";
-#endif // c_net_debug
-
 		//number of nodes in next layer (unless output layer)
 		if(i < (parm.layers - 1))
 		{
 		    nodes_next = parm.netLayerNodes[i + 2];
-#ifdef c_net_debug
-    debug_log << "Nodes in next layer: " << nodes_next << "\n";
-#endif // c_net_debug
 	    }
 
 		//loop through nodes
@@ -677,28 +685,15 @@ void C_Net::RunTrainingCycle(void)
 
             activation = layers[i].node_activation[j];
 
-#ifdef c_net_debug
-    debug_log << "Processing node " << j << " \n\n";
-    debug_log << "activation value " << activation << "\n";
-#endif // c_net_debug
-
             //check if output layer
             if(i == (parm.layers - 1))
             {
                 delta = activation*(1 - activation)*(desired_outputs[j] - activation);
             }
 
-#ifdef c_net_debug
-    debug_log << "desired output " << j << " = " << desired_outputs[j] << "\n";
-    debug_log << "looping through " << nodes_prev + 1 << " weights\n";
-#endif // c_net_debug
-
 			//loop through weights
 			for( k=0; k<(nodes_prev + 1); k++)
 			{
-#ifdef c_net_debug
-    debug_log << "Processing weight " << k << "\n";
-#endif // c_net_debug
 			    //not output layer
                 if(i != (parm.layers - 1))
                 {
@@ -708,33 +703,19 @@ void C_Net::RunTrainingCycle(void)
                     {
                         deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
                     }
-#ifdef c_net_debug
-    debug_log << "deltaWSum = " << deltaWSum << "\n";
-#endif // c_net_debug
                     delta = activation*(1 - activation)*(deltaWSum);
                 }
 
-#ifdef c_net_debug
-    debug_log << "delta = " << delta << "\n";
-#endif // c_net_debug
 
 				//set deltaW
 				layers[i].deltaW[j*(nodes_prev + 1) + k] = delta*layers[i].weights[j*(nodes_prev + 1) + k];
 
-#ifdef c_net_debug
-    debug_log << "weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
-    debug_log << "deltaW " << j << ", " << k << " = " << layers[i].deltaW[j*(nodes_prev + 1) + k] << "\n";
-#endif // c_net_debug
 
 				//adjust weight
 				if(k == nodes_prev)
 				{
 					//bias weight
 					layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;
-#ifdef c_net_debug
-    debug_log << "bias weight\n" << "weight change = " << parm.learningRate*delta << "\n";
-    debug_log << "new weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
-#endif // c_net_debug
 				}
 				else
 				{
@@ -742,18 +723,10 @@ void C_Net::RunTrainingCycle(void)
 					if(i == 0)
 					{
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*inputs[k];
-#ifdef c_net_debug
-    debug_log << "input layer\n" << "weight change = " << parm.learningRate*delta*inputs[k] << "\n";
-    debug_log << "new weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
-#endif // c_net_debug
 					}
 					else
 					{
 					    layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
-#ifdef c_net_debug
-    debug_log << "weight change = " << parm.learningRate*delta*layers[i - 1].node_activation[k] << "\n";
-    debug_log << "new weight = " << layers[i].weights[j*(nodes_prev + 1) + k] << "\n";
-#endif // c_net_debug
 
 					}
 				}
@@ -769,7 +742,7 @@ Author: Jacob, Johnathan, Allison
 
 Description: This function does a forward pass through the net
 to get hte outputs. Then runs backwards through the net to get
-the new weights. It cacluates and stores the error which is 
+the new weights. It cacluates and stores the error which is
 printed to the console every 10 epochs.
 
 Parameters:
@@ -885,14 +858,16 @@ void C_Net::testRun()
   int i, j;
 	int a1, a2, a3;
   //loop through training sets
+  cout << "Year, Actual, Predicted" << endl;
+
   for(j=0; j<sets_training_data; j++)
   {
     //set inputs
     inputs = training_data[j] + 1;
-		cout << "inputs: = ";
-		for (i = 0; i < parm.netLayerNodes[0]; i++)
-			cout << inputs[i] << " ";
-		cout << endl;
+		// cout << "inputs: = ";
+		// for (i = 0; i < parm.netLayerNodes[0]; i++)
+		// 	cout << inputs[i] << " ";
+		// cout << endl;
 
     //set desired outputs
 		if(training_data[j][0] < parm.lowCutoffNorm)
@@ -920,10 +895,13 @@ void C_Net::testRun()
 		desired_outputs[1] = a2;
 		desired_outputs[2] = a3;
 
-    cout << "Desired Output: " << desired_outputs[0] <<
-      ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-      ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
-      << outputs[2] << endl;
+    // cout << "Desired Output " << j << " : " << desired_outputs[0] <<
+    //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
+    //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+    //   << outputs[2] << endl;
+
+  	printResults(j);
+
   }
 }
 
@@ -945,16 +923,16 @@ Return:
 
 void C_Net::CVtestRun()
 {
-	int i, j;
+	int i;
 	int a1, a2, a3;
 
   if(training_data[sets_training_data][0] < parm.lowCutoffNorm)
 	{
-  	    a1 = 1;
+  	a1 = 1;
 		a2 = 0;
 		a3 = 0;
 	}
-	else if(training_data[j][0] < parm.mediumCutoffNorm)
+	else if(training_data[sets_training_data][0] < parm.mediumCutoffNorm)
 	{
 		a1 = 0;
 		a2 = 1;
@@ -972,7 +950,6 @@ void C_Net::CVtestRun()
   desired_outputs[0] = a1;
 	desired_outputs[1] = a2;
 	desired_outputs[2] = a3;
-
 
   printResults(sets_training_data);
 }
@@ -999,7 +976,7 @@ void C_Net::setData(Parameters newData)
 Function: C_Net::TrainNet
 Author: Jacob, Johnathan, and Allison
 
-Description: Calls the functions to train the data. 
+Description: Calls the functions to train the data.
 
 Parameters:
 	None
@@ -1035,7 +1012,11 @@ unsigned int C_Net::TestNet(void)
 {
     Initialize();
     readInData();
+
+    wrong = 0;
+
     testRun();
+    printError();
 
 	return 1;
 }
@@ -1057,25 +1038,39 @@ Return:
 ********************************************************/
 unsigned int C_Net::CrossValidateNet(void)
 {
-	int i, j, m;
+	int i, j, k, m;
 
 	double temp;
 
 	Initialize();
 	readInData();
 
-	m = parm.PDSIdata + parm.burnedAcreage;
+	m = parm.PDSIdata + parm.burnedAcreage + 2;
 
-	double temp_training_data[sets_training_data][m];
+	//double temp_training_data[sets_training_data][m];
+
+	temp_training_data = new double*[sets_training_data];
+
+    for( i=0; i<sets_training_data; i++)
+    {
+        temp_training_data[i] = new double[m];
+    }
 
   //put clean copy of training data in temp
+
+  cout << "Year, Actual, Predicted" << endl;
+
+  wrong = 0;
+
   for (i = 0; i < sets_training_data; i++)
   {
-  	temp_training_data[i][0] = training_data[i][0];
+  	//temp_training_data[i][0] = training_data[i][0];
   	for (j = 0; j < m; j++)
   	{
+  		// cout << training_data[i][j] << " ";
   		temp_training_data[i][j] = training_data[i][j];
   	}
+  	// cout << endl;
   }
 
 	for (i = 0; i < sets_training_data; i++)
@@ -1085,6 +1080,8 @@ unsigned int C_Net::CrossValidateNet(void)
 		{
 			SetSmallRandomWeights();
 		}
+
+		// cout << training_data[i][m-1] << endl;
 
 		//swtiches point that will be tested with last point
 		for (j = 0; j < m; j++)
@@ -1100,18 +1097,31 @@ unsigned int C_Net::CrossValidateNet(void)
 		fullTrainingRun(false);
 
 		// test on training_data[i][all]
+		// cout << training_data[sets_training_data][m-1] << endl;
 		CVtestRun();
-		// reset training_data and sets_training_data
-		for (j = 0; j < m; j++)
-		{
-			training_data[i][j] = temp_training_data[i][j];
-			training_data[sets_training_data][j] = temp_training_data[sets_training_data][j];
-		}
+
 		sets_training_data++;
+
+		// reset training_data and sets_training_data
+		for (k = 0; k < sets_training_data; k++)
+  	{
+  		//temp_training_data[k][0] = training_data[k][0];
+  		for (j = 0; j < m; j++)
+  		{
+  		// cout << training_data[i][j] << " ";
+  			training_data[k][j] = temp_training_data[k][j];
+  		}
+  	// cout << endl;
+  	}
 	}
 
+	for( i=0; i<sets_training_data; i++)
+    {
+        delete[] temp_training_data[i];
+    }
+	delete[] temp_training_data;
 
-	//print test results
+	printError();
 	return 0;
 }
 
@@ -1156,27 +1166,28 @@ Return:
 	None
 
 ********************************************************/
-void C_Net::printResults()
+void C_Net::printResults(int rowNum)
 {
 
-	cout << "Year, Actual, Predicted" << endl;
-	/*************
-	for (int i = 0; i < years; i++)
-	{
-		cout << year << ", " << actual, << ", " << predicted;
-		if (predicted != actual)
-			cout << ", *";
+	cout << training_data[rowNum][parm.netLayerNodes[0] + 1] << ", " <<
+	desired_outputs[0] << desired_outputs[1] << desired_outputs[2] << ", "
+	<< int(outputs[0] + .5) << int(outputs[1] + .5) << int(outputs[2] + .5);
 
-		cout << endl;
+	if ((desired_outputs[0] != int(outputs[0] + .5)) ||
+		(desired_outputs[1] != int(outputs[1] + .5)) ||
+		(desired_outputs[2] != int(outputs[2] + .5)))
+	{
+		cout << ", *";
+		wrong++;
 	}
 
+	cout << endl;
 
-	***************/
 }
 
 /*******************************************************
 Function: C_Net::printError()
-Author: Allison 
+Author: Allison
 
 Description: Calculates and prints the percent correct
 from the testing and cross validates

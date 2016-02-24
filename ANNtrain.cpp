@@ -6,7 +6,7 @@ Authors: Jacob St. Amand, Johnathan Avkerman, and  Allison Bodvig
 
 Due Date: February 24, 2016
 
-Description: 
+Description:
 
 
 Usage: ANNtest <parameter>
@@ -22,7 +22,7 @@ Author: Jacob, Johnathan, Allison
 
 Description: This function checks for correct usage and then
 calls the appropiate functions to read in the parameters file
-and train the data. 
+and train the data.
 
 Parameters:
 	argc  		- number of arguments
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	net.setData(parameters.getData());
 
 	//net.TrainNet();
-	net.TrainNet();
+	net.TestNet();
 	return 0;
 }
 

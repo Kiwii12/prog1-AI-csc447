@@ -13,7 +13,10 @@ struct T_Layer
     //number of weights will be nodes in layer[i] * nodes in layer[i-1]
     //all weights of node[0], then all weights of node[1], etc
     double* weights;
+	double* delta;
+	double* delta_prev;
 	double* deltaW;
+	double* deltaW_prev;
 
     //number of each below will be nodes in layer[i]
     double* node_activation;
@@ -48,11 +51,11 @@ public:
 
 	//completes the training cycle
 	void fullTrainingRun(bool print);
-    
+
     //completes the test cycle
     void testRun();
 
-    //completes the test cycle for cross validation 
+    //completes the test cycle for cross validation
     void CVtestRun();
 
 	//Needs to get the param file data <- pulled from ANN.h
