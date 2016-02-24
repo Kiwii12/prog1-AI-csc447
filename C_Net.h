@@ -71,6 +71,9 @@ public:
     //print results to the screen
     void printResults(int rowNum);
 
+    //print percent error
+    void printError();
+
 private:
     unsigned int num_of_inputs;
     double* inputs;
@@ -92,6 +95,8 @@ private:
 	double** testing_data;
 
 	Parameters parm;
+
+    int wrong;
 
 };
 

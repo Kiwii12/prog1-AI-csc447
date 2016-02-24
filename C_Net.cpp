@@ -1034,7 +1034,11 @@ unsigned int C_Net::TestNet(void)
 {
     Initialize();
     readInData();
+
+    wrong = 0;
+
     testRun();
+    printError();
 
 	return 1;
 }
@@ -1078,6 +1082,8 @@ unsigned int C_Net::CrossValidateNet(void)
   //put clean copy of training data in temp
 
   cout << "Year, Actual, Predicted" << endl;  
+
+  wrong = 0;
 
   for (i = 0; i < sets_training_data; i++)
   {
@@ -1138,7 +1144,7 @@ unsigned int C_Net::CrossValidateNet(void)
     }
 	delete[] temp_training_data;
 
-	//print test results 
+	printError();
 	return 0;
 }
 
@@ -1196,27 +1202,35 @@ void C_Net::printResults(int rowNum)
 		(desired_outputs[2] != int(outputs[2] + .5)))
 	{
 		cout << ", *";
+		wrong++;
 	}
-
-
 
 	cout << endl;
 
-	// cout << "Desired Output " << j << " : " << desired_outputs[0] <<
-    //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-    //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
-    //   << outputs[2] << endl;
+}
 
-	/*************
-	for (int i = 0; i < years; i++)
-	{
-		cout << year << ", " << actual, << ", " << predicted;
-		if (predicted != actual)
-			cout << ", *";
+/*******************************************************
+Function: C_Net::printError()
+Author: 
 
-		cout << endl;
-	}
+Description: Calculates and prints the percent correct
+from the testing and cross validates
 
+Parameters:
+	None
 
-	***************/
+Return:
+	None
+
+********************************************************/
+
+void C_Net::printError()
+{
+	double percent;
+
+	percent = sets_training_data - wrong;
+	percent = percent/sets_training_data;
+	percent = percent * 100;
+
+	cout << "Percent Correct: " << percent << "%" << endl;
 }
