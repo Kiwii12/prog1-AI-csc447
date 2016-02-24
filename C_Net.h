@@ -69,7 +69,7 @@ public:
     void printEpoch(int eNum, double squareError);
 
     //print results to the screen
-    void printResults();
+    void printResults(int rowNum);
 
 private:
     unsigned int num_of_inputs;
