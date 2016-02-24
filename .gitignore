@@ -29,3 +29,5 @@ Debug/input.obj.enc
 Debug/prog1.ilk
 Debug/prog1.ilk
 weights.wts
+AI.vcxproj
+*.filters
