@@ -147,6 +147,7 @@ unsigned int C_Net::LoadWeightsFromFile()
 	int i, j;
 	int count = 0;
 	int nodes, nodes_prev;
+	double temp;
 	ifstream fin;
 	fin.open(parm.weightsFile);
 	for (i = 0; i<(parm.layers); i++)
@@ -163,8 +164,27 @@ unsigned int C_Net::LoadWeightsFromFile()
                         //also reset deltaW_prev
 			layers[i].deltaW_prev[j] = 0.0;
 			layers[i].deltaW[j] = 0.0;
+			if(!fin.good())
+			{
+				fin.close();
+				cout << "Error! Invalid weights file!\n";
+				cout << "Generating new weights.\n";
+				SetSmallRandomWeights();
+				return 1;
+			}
 		}
 	}
+
+	fin >> temp;
+	if(fin.good())
+	{
+		fin.close();
+		cout << "Error! Invalid weights file!\n";
+		cout << "Generating new weights.\n";
+		SetSmallRandomWeights();
+		return 1;
+	}
+
 	fin.close();
     return 1;
 }
@@ -870,13 +890,22 @@ void C_Net::fullTrainingRun(bool print)
 
     s_error = s_error/(double)sets_training_data;
 
+    s_error = sqrt(s_error);
+
     //checks if we want epoch number printed
     if (print)
     {
      	if (( (i+1) % 10 ) == 0)
      		printEpoch(i+1, s_error);
     }
-	}
+    if(s_error < parm.threshold)
+    {
+	cout << "error below training cutoff\n";
+	printEpoch(i+1, s_error);
+	break;
+    }
+
+    }
 
 }
 
@@ -1187,7 +1216,7 @@ void C_Net::printEpoch(int eNum, double squareError)
 	double rms;
 
 	//rms = squareError / eNum;
-	rms = sqrt(squareError);
+	rms = squareError;
 
 	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
 }
