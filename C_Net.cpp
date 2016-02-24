@@ -2,20 +2,29 @@
 #include <cstring>
 #include <algorithm>
 
+//#define c_net_debug
+
+#ifdef c_net_debug
+    ofstream debug_log;
+#endif // c_net_debug
+
 //set values to zero
 //set pointers to null
 C_Net::C_Net()
 {
-
+#ifdef c_net_debug
+    debug_log.open("debug_log.txt", ofstream::out | ofstream::trunc);
+    debug_log << "Debug Log Start...\n";
+#endif // c_net_debug
 }
 
 //deallocate memory used by non-null pointers
 C_Net::~C_Net()
 {
-	// if (parm.netLayerNodes != nullptr)
-	// {
-	// 	delete[] parm.netLayerNodes;
-	// }
+#ifdef c_net_debug
+    debug_log << "Debug Log End...";
+    debug_log.close();
+#endif // c_net_debug
 
 	//free dynamically allocated memory
 	int i;
@@ -40,6 +49,7 @@ C_Net::~C_Net()
 //set values and allocate all needed memory
 unsigned int C_Net::Initialize()
 {
+
 	//Make sure setData is called before this function!!!
 
 	//memory allocation
@@ -148,6 +158,8 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 	int count;
 	int nodes, nodes_prev;
 
+    srand(time(NULL));
+
 	//loop through the number of layers and nodes
 	for (i = 0; i<(parm.layers); i++)
 	{
@@ -156,8 +168,6 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 		nodes_prev = parm.netLayerNodes[i];
 		count = nodes*nodes_prev + nodes;
 
-		//srand(time(NULL));
-		srand(5);
 	 	for (j = 0; j < count; ++j)
 		{
 			//creates random weights bewtween [-1,1]
@@ -291,7 +301,6 @@ bool C_Net::readInData()
 	if (dataFile.fail())
 	{
 		cout << "Unable to open " << parm.dataFile << endl;;
-		exit(1);
 	}
 
 	//ignores the first two lines
@@ -424,6 +433,7 @@ void C_Net::randomizeTrainingSets(void)
     //randomly shuffle the training data using Knuth shuffle
     int i, j, m;
     double* tempA;
+    //number of inputs + desired_output + year
     m = parm.netLayerNodes[0] + 2;
     srand(time(NULL));
     tempA = new double[m];
@@ -469,6 +479,12 @@ unsigned int C_Net::SetDesiredOutputs(double* desired_outputs_array, unsigned in
 //runs forward through the net
 void C_Net::UpdateNet(void)
 {
+
+#ifdef c_net_debug
+    debug_log << "\n\n\n\n\nStarting UpdateNet...\n";
+    debug_log << "Looping through " << parm.layers << " layers\n";
+#endif // c_net_debug
+
 	int i, j, k;
 	int nodes;
 	int nodes_prev;
@@ -479,15 +495,31 @@ void C_Net::UpdateNet(void)
 		nodes = parm.netLayerNodes[i + 1];
 		//number of nodes in previous layer
 		nodes_prev = parm.netLayerNodes[i];
+
+#ifdef c_net_debug
+    debug_log << "Processing layer " << i << "\n\n\n";
+    debug_log << "Nodes in current layer: " << nodes << "\n";
+    debug_log << "Nodes in previous layer: " << nodes_prev << "\n";
+#endif // c_net_debug
+
 		//loop through nodes
 		for( j=0; j<nodes; j++)
 		{
+#ifdef c_net_debug
+    debug_log << "Processing node " << j << " \n\n";
+    debug_log << "Setting node_value " << i << ", " << j << " to zero\n";
+    debug_log << "Looping through " << nodes_prev << " weights\n";
+#endif // c_net_debug
+
 			//clear node value
 			layers[i].node_value[j] = 0;
 			//loop through weights
 			for( k=0; k<nodes_prev; k++)
 			{
-				//sum inputs (original input values)
+#ifdef c_net_debug
+    debug_log << "Processing weight " << k << "\n";
+#endif // c_net_debug
+				//sum inputs (from prev layer nodes)
 				if(i == 0)
 				{
 					//input layer is special case
@@ -495,11 +527,22 @@ void C_Net::UpdateNet(void)
 					//wieght is (current node)*nodes + (current weight)
 					//+1 to account for bias weight
 					layers[i].node_value[j] += inputs[k]*layers[i].weights[j*(nodes_prev+1) + k];
+#ifdef c_net_debug
+    debug_log << "node_value += input*weight\n";
+    debug_log << "input " << k << " = " << inputs[k] << "\n";
+    debug_log << "weight " << j << ", " << k << " = " << layers[i].weights[j*(nodes_prev+1) + k] << "\n";
+    debug_log << "node_value = " << layers[i].node_value[j] << "\n";
+#endif // c_net_debug
 				}
 				else
 				{
-					//sum inputs from prev layer nodes
-					layers[i].node_value[j] += layers[i-1].node_activation[j]*layers[i].weights[j*(nodes_prev+1) + k];
+					layers[i].node_value[j] += layers[i-1].node_activation[k]*layers[i].weights[j*(nodes_prev+1) + k];
+#ifdef c_net_debug
+    debug_log << "node_value += prev node activation*weight\n";
+    debug_log << "prev node activation " << k << " = " << layers[i-1].node_activation[k] << "\n";
+    debug_log << "weight " << j << ", " << k << " = " << layers[i].weights[j*(nodes_prev+1) + k] << "\n";
+    debug_log << "node_value = " << layers[i].node_value[j] << "\n";
+#endif // c_net_debug
 				}
 
 			}
@@ -509,15 +552,21 @@ void C_Net::UpdateNet(void)
 			//now use sigmoid function
 			layers[i].node_activation[j] = (1.0/(1.0 + pow(2.7182818284, (-1.0*layers[i].node_value[j]))));
 
+#ifdef c_net_debug
+    debug_log << "processing bias weight\n";
+    debug_log << "node_value += weight\n";
+    debug_log << "weight " << j << ", " << k << " = " << layers[i].weights[j*(nodes_prev+1) + k] << "\n";
+    debug_log << "node_value = " << layers[i].node_value[j] << "\n";
+    debug_log << "node_activation = " << layers[i].node_activation[j] << "\n";
+#endif // c_net_debug
+
 			//set output values
 			if(i == (parm.layers - 1))
             {
                 outputs[j] = layers[i].node_activation[j];
-				cout << outputs[j] << ", ";
-				if (j % 3 == 2)
-				{
-					cout << " = Output of a training run!@!!@!@@!!" << endl;
-				}
+#ifdef c_net_debug
+    debug_log << "setting output " << j << " = " << outputs[j] << "\n";
+#endif // c_net_debug
             }
 
 		}
@@ -546,7 +595,7 @@ void C_Net::RunTrainingCycle(void)
 		//number of nodes in previous layer
 		nodes_prev = parm.netLayerNodes[i];
 		//number of nodes in next layer (unless output layer)
-		if(i < (parm.layers))
+		if(i < (parm.layers - 1))
 		{
 		    nodes_next = parm.netLayerNodes[i + 2];
 	    }
@@ -555,25 +604,29 @@ void C_Net::RunTrainingCycle(void)
 		for( j=0; j<nodes; j++)
 		{
 
+            activation = layers[i].node_activation[j];
+
+            //check if output layer
+            if(i == (parm.layers - 1))
+            {
+                delta = activation*(1 - activation)*(desired_outputs[j] - activation);
+            }
+
 			//loop through weights
 			for( k=0; k<(nodes_prev + 1); k++)
 			{
-		        activation = layers[i].node_activation[j];
-				//check if output layer
-				if(i == (parm.layers - 1))
-				{
-					delta = activation*(1 - activation)*(desired_outputs[j] - activation);
-				}
-				else
-				{
-					deltaWSum = 0;
-					//sum all the deltaW of next layer
-					for( l=0; l<nodes_next; l++)
-					{
-						deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
-					}
-					delta = activation*(1 - activation)*(deltaWSum);
-				}
+			    //not output layer
+                if(i != (parm.layers - 1))
+                {
+                    deltaWSum = 0;
+                    //sum all the deltaW of next layer
+                    for( l=0; l<nodes_next; l++)
+                    {
+                        deltaWSum += layers[i+1].deltaW[l*(nodes + 1) + k];
+                    }
+                    delta = activation*(1 - activation)*(deltaWSum);
+                }
+
 				//set deltaW
 				layers[i].deltaW[j*(nodes_prev + 1) + k] = delta*layers[i].weights[j*(nodes_prev + 1) + k];
 
@@ -592,6 +645,10 @@ void C_Net::RunTrainingCycle(void)
 					}
 					else
 					{
+					    //if(layers[i - 1].node_activation[k] >= 0.5)
+                        //{
+                        //    layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta;
+                        //}
 						layers[i].weights[j*(nodes_prev + 1) + k] += parm.learningRate*delta*layers[i - 1].node_activation[k];
 					}
 				}
@@ -651,12 +708,13 @@ void C_Net::fullTrainingRun(bool print)
             UpdateNet();
 
             //add s_errror
-            output_diff1 = abs((desired_outputs[0] - outputs[0])/3.0);
-            output_diff2 = abs((desired_outputs[1] - outputs[1])/3.0);
-            output_diff3 = abs((desired_outputs[2] - outputs[2])/3.0);
-            output_diff1 = output_diff1 + output_diff2 + output_diff3;
-            s_error += output_diff1*output_diff1;
-
+            output_diff1 = desired_outputs[0] - outputs[0];
+            output_diff2 = desired_outputs[1] - outputs[1];
+            output_diff3 = desired_outputs[2] - outputs[2];
+            output_diff1 = output_diff1*output_diff1;
+            output_diff2 = output_diff2*output_diff2;
+            output_diff3 = output_diff3*output_diff3;
+            s_error += (output_diff1 + output_diff2 + output_diff3)/3.0;
 
             RunTrainingCycle();
 
@@ -760,7 +818,7 @@ void C_Net::CVtestRun()
 
   cout << "Desired Output: " << desired_outputs[0] <<
     ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-    ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
+    ". Test output: " << outputs[0] + .5 << ", " << outputs[1] << ", "
      << outputs[2] << endl;
 }
 
@@ -826,18 +884,16 @@ unsigned int C_Net::TestNet(void)
 
 unsigned int C_Net::CrossValidateNet(void)
 {
-
 	int i, j, m;
 
+	double temp;
 
-	double temp;	
-	
 	Initialize();
 	readInData();
 
 	m = parm.PDSIdata + parm.burnedAcreage;
 
-	//double temp_training_data[sets_training_data][m];
+	double temp_training_data[sets_training_data][m];
 
   //put clean copy of training data in temp
   for (i = 0; i < sets_training_data; i++)
@@ -881,8 +937,7 @@ unsigned int C_Net::CrossValidateNet(void)
 		sets_training_data++;
 	}
 
-	//print test results */
-	return 0;
+	//print test results
 }
 
 void C_Net::printEpoch(int eNum, double squareError)

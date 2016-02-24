@@ -93,11 +93,11 @@ public:
 
 	//completes the training cycle
 	void fullTrainingRun(bool print);
-    
+
     //completes the test cycle
     void testRun();
 
-    //completes the test cycle for cross validation 
+    //completes the test cycle for cross validation
     void CVtestRun();
 
 	//Does a test run of the net
