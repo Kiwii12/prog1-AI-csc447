@@ -1,8 +1,22 @@
 #include "C_Net.h"
 #include "Input.h"
 
-//function prototypes
-//int train_Net(C_Net* Net, C_LoadParameters* Parameters);
+/*******************************************************
+Function: main
+Author: 
+
+Description: This function checks for correct usage and then
+calls the appropiate functions to read in the parameters file
+and train the data. 
+
+Parameters:
+	argc  		- number of arguments
+	argv	 		- list og arguments from the command line
+
+Return:
+	None
+
+********************************************************/;
 
 int main(int argc, char** argv)
 {

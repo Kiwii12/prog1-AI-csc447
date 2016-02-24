@@ -733,7 +733,7 @@ void C_Net::fullTrainingRun(bool print)
 Function: C_Net::testRun()
 Author: 
 
-Description: 
+Description: Tests the array of data that is given
 
 Parameters:
 	None
@@ -790,6 +790,21 @@ void C_Net::testRun()
   }
 }
 
+/*******************************************************
+Function: C_Net::CVtestRun()
+Author: 
+
+Description: Tests a sing year of data. Used for testing 
+with cross validation
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
+
 void C_Net::CVtestRun()
 {
 	int i, j;
@@ -831,11 +846,38 @@ void C_Net::CVtestRun()
      << outputs[2] << endl;
 }
 
+/*******************************************************
+Function: C_Net::setData()
+Author: 
+
+Description: Moves the parameter data the parm parameter
+
+Parameters:
+	newData		- holds the data from the parameter file 
+
+Return:
+	None
+
+********************************************************/
 
 void C_Net::setData(Parameters newData)
 {
 	parm = newData;
 }
+
+/*******************************************************
+Function: C_Net::TrainNet
+Author: 
+
+Description: Calls the functions to train the data 
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 
 unsigned int C_Net::TrainNet(void)
 {
@@ -846,6 +888,21 @@ unsigned int C_Net::TrainNet(void)
 	return 1;
 }
 
+/*******************************************************
+Function: C_Net::TestNet()
+Author: 
+
+Description: This function gets the data from the parameter
+file and then test the data
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
+
 unsigned int C_Net::TestNet(void)
 {
     Initialize();
@@ -854,6 +911,22 @@ unsigned int C_Net::TestNet(void)
 
 	return 1;
 }
+
+/*******************************************************
+Function: C_Net::CrossValidateNet()
+Author: 
+
+Description: Goes through the data and takes one point out, 
+trains on the rest and then tests the point that was taken
+out. This is repeated for each data point that is given.
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 
 unsigned int C_Net::CrossValidateNet(void)
 {
@@ -914,6 +987,21 @@ unsigned int C_Net::CrossValidateNet(void)
 	return 0;
 }
 
+/*******************************************************
+Function: C_Net::printEpoch()
+Author: 
+
+Description: This function prints the epoch number and
+the root mean square error to the command line.
+
+Parameters:
+	squareError 	- mean squared error that is calculated
+
+Return:
+	None
+
+********************************************************/
+
 void C_Net::printEpoch(int eNum, double squareError)
 {
 	//need to calcualte RMS
@@ -925,7 +1013,21 @@ void C_Net::printEpoch(int eNum, double squareError)
 	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
 }
 
+/*******************************************************
+Function: C_Net::printResults()
+Author: 
 
+Description: This function prints the year, actual fire
+severity and the predicted fire severity. If the actual 
+and predicted do not match, an * is printed as well.
+
+Parameters:
+	None
+
+Return:
+	None
+
+********************************************************/
 void C_Net::printResults()
 {
 
