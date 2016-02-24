@@ -148,7 +148,24 @@ Return:
 
 void Input::setData(char prms[20][50])
 {
+	int i;
+
 	parm.weightsFile = prms[0];
+	//get rid of trailing spaces in weightsFile
+	i = 0;
+	while(1)
+	{
+		if((int)parm.weightsFile[i] == 32)
+		{
+			parm.weightsFile[i] = 0;
+			break;
+		}
+		if((int)parm.weightsFile[i] == 0)
+		{
+			break;
+		}
+		i++;
+	}
 	parm.numberTrainingEpochs = stoi((string)prms[1]);
 	parm.learningRate = stod((string)prms[2]);
 	parm.momentum = stod(prms[3]);
@@ -162,7 +179,7 @@ void Input::setData(char prms[20][50])
 
 	string temp = prms[6];
 	istringstream myStringStream(temp);
-	int i = 0;
+	i = 0;
 	while (getline(myStringStream, temp, ' ') && i < parm.layers + 1)
 	{
 		parm.netLayerNodes[i] = (stoi(temp));

@@ -8,6 +8,7 @@
     ofstream debug_log;
 #endif // c_net_debug
 
+
 /*******************************************************
 Function: C_Net::C_Net()
 Author: Jacob
@@ -143,23 +144,25 @@ Return:
 ********************************************************/
 unsigned int C_Net::LoadWeightsFromFile()
 {
+	int i, j;
 	int count = 0;
 	int nodes, nodes_prev;
 	ifstream fin;
 	fin.open(parm.weightsFile);
-	for (int i = 0; i<(parm.layers); i++)
+	for (i = 0; i<(parm.layers); i++)
 	{
 
 		nodes = parm.netLayerNodes[i + 1];
 		nodes_prev = parm.netLayerNodes[i];
 		count = nodes*nodes_prev + nodes;
 
-		for (int j = 0; j < count; ++j)
+		for (j = 0; j < count; ++j)
 		{
 			//creates random weights bewtween [-1,1]
 			fin >> layers[i].weights[j];
-            //also reset delta_prev, deltaW_prev
+                        //also reset deltaW_prev
 			layers[i].deltaW_prev[j] = 0.0;
+			layers[i].deltaW[j] = 0.0;
 		}
 	}
 	fin.close();
@@ -183,6 +186,7 @@ Return:
 ********************************************************/
 unsigned int C_Net::SaveWeightsToFile()
 {
+	int i, j;
 	int count = 0;
 	int nodes, nodes_prev;
 	ofstream fout;
@@ -190,14 +194,14 @@ unsigned int C_Net::SaveWeightsToFile()
 	//open the weights file
 	fout.open(parm.weightsFile, std::ios_base::trunc);
 
-	for (int i = 0; i<(parm.layers); i++)
+	for (i = 0; i<(parm.layers); i++)
 	{
 
 		nodes = parm.netLayerNodes[i + 1];
 		nodes_prev = parm.netLayerNodes[i];
 		count = nodes*nodes_prev + nodes;
 
-		for (int j = 0; j < count; ++j)
+		for (j = 0; j < count; ++j)
 		{
 			//print weigths to file
 			fout << layers[i].weights[j] << endl;
@@ -242,8 +246,9 @@ unsigned int C_Net::SetSmallRandomWeights(void)
 		{
 			//creates random weights bewtween [-1,1]
 			layers[i].weights[j] = -1 + float (rand())/ (float (RAND_MAX/(2)));
-			//also reset delta_prev, deltaW_prev
+			//also reset deltaW_prev
 			layers[i].deltaW_prev[j] = 0.0;
+			layers[i].deltaW[j] = 0.0;
 		}
 	}
 
@@ -767,7 +772,6 @@ void C_Net::RunTrainingCycle(void)
                 //now change weights
                 deltaW_prev = layers[i].deltaW_prev[j*(nodes_prev + 1) + k];
                 layers[i].weights[j*(nodes_prev + 1) + k] += deltaW + parm.momentum*deltaW_prev;
-
 			}
 		}
 	}
