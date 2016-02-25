@@ -6,7 +6,8 @@ Authors: Jacob St. Amand, Johnathan Avkerman, and  Allison Bodvig
 
 Due Date: February 24, 2016
 
-Description: 
+Description: Once a weights file has been made from training. It 
+test the net on the given data and outputs the percent correct
 
 
 Usage: ANNtest <parameter>

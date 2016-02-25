@@ -6,10 +6,12 @@ Authors: Jacob St. Amand, Johnathan Avkerman, and  Allison Bodvig
 
 Due Date: February 24, 2016
 
-Description: 
+Description: Cross Validates the given data by removing
+one of the data sets, Training on that data, and then testing the
+output on the removed data set.
 
 
-Usage: ANNtest <parameter>
+Usage: CrossValidate <parameter>
 
 ****************************************/
 
@@ -32,7 +34,6 @@ Return:
 	None
 
 *****************************************************/
-
 int main(int argc, char** argv)
 {
 	int error;

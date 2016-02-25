@@ -6,10 +6,12 @@ Authors: Jacob St. Amand, Johnathan Avkerman, and  Allison Bodvig
 
 Due Date: February 24, 2016
 
-Description:
+Description: Uses the C_Net class to train a net with either
+given weights or with randomly generated ones. This is ment
+to be called before the ANNtest executable
 
 
-Usage: ANNtest <parameter>
+Usage: ANNtrain <parameter>
 
 ****************************************/
 

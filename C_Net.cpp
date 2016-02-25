@@ -122,7 +122,7 @@ unsigned int C_Net::Initialize()
            LoadWeightsFromFile();
        }
        else {
-	  //Train Function ALWAYS starts with new weights
+	  //Train Function starts with new weights
 	   SetSmallRandomWeights();
        }
 

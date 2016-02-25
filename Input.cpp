@@ -23,7 +23,6 @@ Return:
 	None
 
 ********************************************************/
-
 Input::Input( string paramFileName )
 {
 	parm.paramFile = paramFileName;
