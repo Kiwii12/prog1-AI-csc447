@@ -1,7 +1,7 @@
 /**************************************************************************//**
  * @file
  *
- * @brief This file contains the function definitions for the ANN class
+ * @brief This file contains the function definitions for the Input class
  *****************************************************************************/
 #include "Input.h"
 
@@ -42,7 +42,6 @@ Return:
 	None
 
 ********************************************************/
-
 Input::~Input()
 {
 	if (parm.netLayerNodes != nullptr)
@@ -126,6 +125,7 @@ bool Input::parseParams()
 	//close the file
 	param.close();
 
+	//moves the data into the parameter file
 	setData(prms);
 
 	return true;
@@ -145,7 +145,6 @@ Return:
 	None
 
 ********************************************************/
-
 void Input::setData(char prms[20][50])
 {
 	int i;
@@ -171,14 +170,13 @@ void Input::setData(char prms[20][50])
 	parm.momentum = stod(prms[3]);
 	parm.threshold = stod(prms[4]);
 	parm.layers = stoi(prms[5]);
-	//int layers = parm.layers;
 
 	//todo convert prms[6] to int array[layers]
 	parm.netLayerNodes = nullptr;
 	parm.netLayerNodes = new (nothrow) int[parm.layers + 1];
 
 	string temp = prms[6];
-	istringstream myStringStream(temp);
+	istringstream myStringStream(temp); //used to parse char* into int*
 	i = 0;
 	while (getline(myStringStream, temp, ' ') && i < parm.layers + 1)
 	{
@@ -201,7 +199,7 @@ void Input::setData(char prms[20][50])
 
 /*******************************************************
 Function: Input::getData()
-Author: 
+Author: Johnathan
 
 Description: Returns the parameters
 
@@ -212,7 +210,6 @@ Return:
 	parm which holds the paramters from the parameter fiel
 
 ********************************************************/
-
 Parameters Input::getData()
 {
 	return parm;
@@ -232,7 +229,6 @@ Return:
 	True or false depending on if the file was opened or not
 
 ********************************************************/
-
 bool Input::openFile( ifstream &fin )
 {
 	fin.open(parm.paramFile);

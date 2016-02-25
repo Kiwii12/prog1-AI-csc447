@@ -576,9 +576,9 @@ void C_Net::UpdateNet(void)
     debug_log << "Looping through " << parm.layers << " layers\n";
 #endif // c_net_debug
 
-	int i, j, k;
-	int nodes;
-	int nodes_prev;
+	int i, j, k; //loop variables
+	int nodes; //number of current nodes
+	int nodes_prev; //number of previous nodes
 	//loop through layers
 	for( i=0; i<parm.layers; i++)
 	{
@@ -625,8 +625,8 @@ void C_Net::UpdateNet(void)
     debug_log << "node_value = " << layers[i].node_value[j] << "\n";
 #endif // c_net_debug
 				}
-				else
-				{
+				else //happens for all layers other than the first layer
+				{ //uses input from previous node values that have been put though the sigmoid function
 				    layers[i].node_value[j] += layers[i-1].node_activation[k]*layers[i].weights[j*(nodes_prev+1) + k];
 #ifdef c_net_debug
     debug_log << "node_value += prev node activation*weight\n";
@@ -836,19 +836,19 @@ void C_Net::fullTrainingRun(bool print)
       inputs = training_data[j] + 1;
 
       //set desired outputs
-			if(training_data[j][0] < parm.lowCutoffNorm)
+			if(training_data[j][0] < parm.lowCutoffNorm) //low
 			{
 				a1 = 1;
 				a2 = 0;
 				a3 = 0;
 			}
-			else if(training_data[j][0] < parm.mediumCutoffNorm)
+			else if(training_data[j][0] < parm.mediumCutoffNorm) //medium
 			{
 				a1 = 0;
 				a2 = 1;
 				a3 = 0;
 			}
-			else
+			else // high
 			{
 				a1 = 0;
 				a2 = 0;
@@ -859,14 +859,6 @@ void C_Net::fullTrainingRun(bool print)
 			desired_outputs[2] = a3;
 
             UpdateNet();
-            //cout << "outputs before:\n";
-            //cout << outputs[0] << "\n";
-            //cout << outputs[1] << "\n";
-            //cout << outputs[2] << "\n";
-            //cout << "desired outputs:\n";
-            //cout << desired_outputs[0] << "\n";
-            //cout << desired_outputs[1] << "\n";
-            //cout << desired_outputs[2] << "\n";
 
             //add s_errror
             output_diff1 = desired_outputs[0] - outputs[0];
@@ -880,32 +872,26 @@ void C_Net::fullTrainingRun(bool print)
 
 
             RunTrainingCycle();
+		}
 
-            //UpdateNet();
-            //cout << "outputs after:\n";
-            //cout << outputs[0] << "\n";
-            //cout << outputs[1] << "\n";
-            //cout << outputs[2] << "\n\n";
+		//devides the s_error by the number of data sets in a year
+		s_error = s_error/(double)sets_training_data;
 
+		//squar root of rms
+		s_error = sqrt(s_error);
 
-    }
-
-    s_error = s_error/(double)sets_training_data;
-
-    s_error = sqrt(s_error);
-
-    //checks if we want epoch number printed
-    if (print)
-    {
-     	if (( (i+1) % 10 ) == 0)
-     		printEpoch(i+1, s_error);
-    }
-    if(s_error < parm.threshold)
-    {
-	cout << "error below training cutoff\n";
-	printEpoch(i+1, s_error);
-	break;
-    }
+		//checks if we want epoch number printed
+		if (print)
+		{
+     		if (( (i+1) % 10 ) == 0)
+     			printEpoch(i+1, s_error);
+		}
+		if(s_error < parm.threshold)
+		{
+			cout << "error below training cutoff\n";
+			printEpoch(i+1, s_error);
+			break;
+		}
 
     }
 
@@ -925,7 +911,6 @@ Return:
 	None
 
 ********************************************************/
-
 void C_Net::testRun()
 {
   int j;
@@ -937,10 +922,6 @@ void C_Net::testRun()
   {
     //set inputs
     inputs = training_data[j] + 1;
-		// cout << "inputs: = ";
-		// for (i = 0; i < parm.netLayerNodes[0]; i++)
-		// 	cout << inputs[i] << " ";
-		// cout << endl;
 
     //set desired outputs
 		if(training_data[j][0] < parm.lowCutoffNorm)
@@ -962,19 +943,14 @@ void C_Net::testRun()
 			a3 = 1;
 		}
 
+	//foward run
     UpdateNet();
 
-		desired_outputs[0] = a1;
-		desired_outputs[1] = a2;
-		desired_outputs[2] = a3;
-
-    // cout << "Desired Output " << j << " : " << desired_outputs[0] <<
-    //   ", " << desired_outputs[1] << ", " << desired_outputs[2] <<
-    //   ". Test output: " << outputs[0] << ", " << outputs[1] << ", "
-    //   << outputs[2] << endl;
+	desired_outputs[0] = a1;
+	desired_outputs[1] = a2;
+	desired_outputs[2] = a3;
 
   	printResults(j);
-
   }
 }
 
@@ -991,16 +967,15 @@ Parameters:
 
 Return:
 	None
-
 ********************************************************/
-
 void C_Net::CVtestRun()
 {
 	int a1, a2, a3;
 
+	//Sets Desired Output
   if(training_data[sets_training_data][0] < parm.lowCutoffNorm)
 	{
-  	a1 = 1;
+  		a1 = 1;
 		a2 = 0;
 		a3 = 0;
 	}
@@ -1017,6 +992,7 @@ void C_Net::CVtestRun()
 		a3 = 1;
 	}
 
+	//Forward run of net
   UpdateNet();
 
   desired_outputs[0] = a1;
@@ -1028,7 +1004,7 @@ void C_Net::CVtestRun()
 
 /*******************************************************
 Function: C_Net::setData()
-Author:
+Author: Johnathan
 
 Description: Moves the parameter data the parm parameter
 
@@ -1059,9 +1035,13 @@ Return:
 ********************************************************/
 unsigned int C_Net::TrainNet(void)
 {
+	//initialize dynamic memory
 	Initialize();
+	//gather data from data file
 	readInData();
+	//Train
 	fullTrainingRun(true);
+	//save weights for later
 	SaveWeightsToFile();
 	return 1;
 }
@@ -1187,6 +1167,7 @@ unsigned int C_Net::CrossValidateNet(void)
   	}
 	}
 
+	//deletes memory
 	for( i=0; i<sets_training_data; i++)
     {
         delete[] temp_training_data[i];
@@ -1211,16 +1192,9 @@ Return:
 	None
 
 ********************************************************/
-
 void C_Net::printEpoch(int eNum, double squareError)
 {
-	//need to calcualte RMS
-	double rms;
-
-	//rms = squareError / eNum;
-	rms = squareError;
-
-	cout << "Epoch Number: " << eNum << " RMS: " << rms << endl;
+	cout << "Epoch Number: " << eNum << " RMS: " << squareError << endl;
 }
 
 /*******************************************************
@@ -1240,11 +1214,12 @@ Return:
 ********************************************************/
 void C_Net::printResults(int rowNum)
 {
-
+	//prints out desired output and rounded output
 	cout << training_data[rowNum][parm.netLayerNodes[0] + 1] << ", " <<
 	desired_outputs[0] << desired_outputs[1] << desired_outputs[2] << ", "
 	<< int(outputs[0] + .5) << int(outputs[1] + .5) << int(outputs[2] + .5);
 
+	//if desired and actual do not match print out *
 	if ((desired_outputs[0] != int(outputs[0] + .5)) ||
 		(desired_outputs[1] != int(outputs[1] + .5)) ||
 		(desired_outputs[2] != int(outputs[2] + .5)))
@@ -1276,9 +1251,11 @@ void C_Net::printError()
 {
 	double percent;
 
+	// calculates percent wrong
 	percent = sets_training_data - wrong;
 	percent = percent/sets_training_data;
 	percent = percent * 100;
 
+	//displays calculations
 	cout << "Percent Correct: " << percent << "%" << endl;
 }
